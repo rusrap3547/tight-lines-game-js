@@ -1,8 +1,8 @@
 import Phaser from "phaser";
 
-export default class GameScene extends Phaser.Scene {
+export default class startScene extends Phaser.Scene {
 	constructor() {
-		super({ key: "GameScene" });
+		super({ key: "startScene" });
 	}
 
 	preload() {
@@ -16,16 +16,16 @@ export default class GameScene extends Phaser.Scene {
 
 		// Add welcome text
 		this.add
-			.text(400, 300, "Tight Lines Game", {
-				fontSize: "32px",
+			.text(150, 70, "Tight Lines Game", {
+				fontSize: "16px",
 				fill: "#fff",
 				fontFamily: "Arial",
 			})
 			.setOrigin(0.5);
 
 		this.add
-			.text(400, 350, "Press SPACE to start", {
-				fontSize: "16px",
+			.text(150, 100, "Press SPACE to start", {
+				fontSize: "8px",
 				fill: "#fff",
 				fontFamily: "Arial",
 			})
@@ -42,7 +42,7 @@ export default class GameScene extends Phaser.Scene {
 		// Game loop logic here
 		if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
 			console.log("Game started!");
-			// You can transition to a new scene here
+			this.scene.start("BoatScene");
 		}
 	}
 }
