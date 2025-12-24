@@ -1,40 +1,128 @@
 import Phaser from "phaser";
 import { Player, Bobber, Fish, FishTypes } from "../gameObjects.js";
 
+// ============================================
+// CONFIGURATION CONSTANTS
+// ============================================
+const GAME_CONFIG = {
+	// Scene dimensions
+	SKY_HEIGHT_PERCENT: 0.3,
+	WATER_HEIGHT_PERCENT: 0.65,
+	SAND_HEIGHT_PERCENT: 0.05,
+
+	// Dock settings
+	DOCK_WIDTH: 150,
+	DOCK_HEIGHT: 30,
+
+	// Fish spawning
+	MIN_FISH_COUNT: 3,
+	MAX_FISH_COUNT: 12,
+	INITIAL_SPAWN_MIN: 5,
+	INITIAL_SPAWN_MAX: 8,
+	SPAWN_INTERVAL_MIN: 2000,
+	SPAWN_INTERVAL_MAX: 5000,
+	DESPAWN_INTERVAL_MIN: 3000,
+	DESPAWN_INTERVAL_MAX: 7000,
+
+	// Colors
+	SKY_COLOR: 0x87ceeb,
+	WATER_COLOR: 0x4a90e2,
+	SAND_COLOR: 0xc2b280,
+	DOCK_COLOR: 0x8b4513,
+	DOCK_POST_COLOR: 0x654321,
+};
+
+// ============================================
+// ASSET PLACEHOLDERS - Replace with actual images later
+// ============================================
+const ASSETS = {
+	player: null, // 'assets/player.png'
+	bobber: null, // 'assets/bobber.png'
+	dock: null, // 'assets/dock.png'
+	background: null, // 'assets/background.png'
+	// Fish assets
+	fish: {
+		salmon: null, // 'assets/fish/salmon.png'
+		trout: null, // 'assets/fish/trout.png'
+		bass: null, // 'assets/fish/bass.png'
+		catfish: null, // 'assets/fish/catfish.png'
+		bluegill: null, // 'assets/fish/bluegill.png'
+	},
+	// UI assets
+	ui: {
+		scoreBoard: null, // 'assets/ui/scoreboard.png'
+		timingBar: null, // 'assets/ui/timing_bar.png'
+		timingMarker: null, // 'assets/ui/timing_marker.png'
+	},
+	// Story mode assets
+	story: {
+		characterPortrait: null, // 'assets/story/character.png'
+		dialogBox: null, // 'assets/story/dialog_box.png'
+	},
+};
+
 export default class boatScene extends Phaser.Scene {
 	constructor() {
 		super({ key: "BoatScene" });
+
+		// Story mode variables (to be implemented)
+		this.storyMode = false;
+		this.currentLevel = 1;
+		this.questProgress = {};
 	}
 
 	create() {
 		const { width, height } = this.cameras.main;
 
-		// Sky at top (30% of screen)
-		this.add.rectangle(0, 0, width, height * 0.3, 0x87ceeb).setOrigin(0, 0);
+		// ============================================
+		// SCENE SETUP
+		// ============================================
 
-		// Water (65% of screen, from 30% to 95%)
+		// Sky at top
 		this.add
-			.rectangle(0, height * 0.3, width, height * 0.65, 0x4a90e2)
+			.rectangle(
+				0,
+				0,
+				width,
+				height * GAME_CONFIG.SKY_HEIGHT_PERCENT,
+				GAME_CONFIG.SKY_COLOR
+			)
 			.setOrigin(0, 0);
 
-		// Sand at bottom (5% of screen)
+		// Water
 		this.add
-			.rectangle(0, height * 0.95, width, height * 0.05, 0xc2b280)
+			.rectangle(
+				0,
+				height * GAME_CONFIG.SKY_HEIGHT_PERCENT,
+				width,
+				height * GAME_CONFIG.WATER_HEIGHT_PERCENT,
+				GAME_CONFIG.WATER_COLOR
+			)
+			.setOrigin(0, 0);
+
+		// Sand at bottom
+		this.add
+			.rectangle(
+				0,
+				height * (1 - GAME_CONFIG.SAND_HEIGHT_PERCENT),
+				width,
+				height * GAME_CONFIG.SAND_HEIGHT_PERCENT,
+				GAME_CONFIG.SAND_COLOR
+			)
 			.setOrigin(0, 0);
 
 		// Dock on right side, along top edge of water
-		const dockWidth = 150;
-		const dockHeight = 30;
+		const dockWidth = GAME_CONFIG.DOCK_WIDTH;
+		const dockHeight = GAME_CONFIG.DOCK_HEIGHT;
 		const dockX = width - dockWidth;
-		// Position at top edge of water (30% mark)
-		const dockY = height * 0.3;
+		const dockY = height * GAME_CONFIG.SKY_HEIGHT_PERCENT;
 
-		// Dock base (brown)
+		// Dock base
 		this.add
-			.rectangle(dockX, dockY, dockWidth, dockHeight, 0x8b4513)
+			.rectangle(dockX, dockY, dockWidth, dockHeight, GAME_CONFIG.DOCK_COLOR)
 			.setOrigin(0, 0);
 
-		// Dock posts (darker brown)
+		// Dock posts
 		const postWidth = 20;
 		const postSpacing = 50;
 		for (let i = 0; i < 3; i++) {
@@ -44,45 +132,60 @@ export default class boatScene extends Phaser.Scene {
 					dockY,
 					postWidth,
 					dockHeight,
-					0x654321
+					GAME_CONFIG.DOCK_POST_COLOR
 				)
 				.setOrigin(0, 0);
 		}
 
+		// ============================================
+		// GAME OBJECTS
+		// ============================================
+
 		// Create player at the end of dock (left side, on top)
 		const playerX = dockX + 10;
-		const playerY = dockY; // Player sits on top of dock
-		this.player = new Player(this, playerX, playerY);
+		const playerY = dockY;
+		this.player = new Player(this, playerX, playerY, ASSETS.player);
 
 		// Create bobber at top of water, to the left of player
-		const bobberX = playerX - 30; // 30px to the left
-		const bobberY = dockY + dockHeight; // At top edge of water (bottom of dock)
-		const sandY = height * 0.95; // Where the sand starts
-		this.bobber = new Bobber(this, bobberX, bobberY, sandY);
+		const bobberX = playerX - 30;
+		const bobberY = dockY + dockHeight;
+		const sandY = height * (1 - GAME_CONFIG.SAND_HEIGHT_PERCENT);
+		this.bobber = new Bobber(this, bobberX, bobberY, sandY, ASSETS.bobber);
 
-		// Set up spacebar input
-		this.spaceKey = this.input.keyboard.addKey(
+		// ============================================
+		// INPUT SETUP
+		// ============================================
+
+		// Use cursors which includes space
+		this.cursors = this.input.keyboard.createCursorKeys();
+		this.spaceBar = this.input.keyboard.addKey(
 			Phaser.Input.Keyboard.KeyCodes.SPACE
 		);
+		this.spaceWasDown = false;
 
 		// Store water boundaries
 		this.waterLeft = 0;
 		this.waterRight = width;
-		this.waterTop = height * 0.3 + dockHeight; // Below dock
-		this.waterBottom = height * 0.95; // Above sand
+		this.waterTop = height * GAME_CONFIG.SKY_HEIGHT_PERCENT + dockHeight;
+		this.waterBottom = height * (1 - GAME_CONFIG.SAND_HEIGHT_PERCENT);
 
-		// Spawn fish
+		// Fish management
 		this.fish = [];
 		this.spawnFish();
+		this.nextSpawnTime = 0;
+		this.nextDespawnTime = 0;
 
-		// Set up timers for fish spawning and despawning
-		this.nextSpawnTime = 0; // Will be set in first update
-		this.nextDespawnTime = 0; // Will be set in first update
-
-		// Initialize score
+		// Score tracking
 		this.score = 0;
 
-		// Create score text in top left corner
+		// Mini-game state (for future timing game)
+		this.miniGameActive = false;
+		this.miniGameSuccess = false;
+
+		// ============================================
+		// UI ELEMENTS
+		// ============================================
+
 		this.scoreText = this.add
 			.text(10, 10, "Score: 0", {
 				fontSize: "16px",
@@ -92,14 +195,20 @@ export default class boatScene extends Phaser.Scene {
 				strokeThickness: 3,
 			})
 			.setOrigin(0, 0);
+
+		// Placeholder for mini-game UI (will be created when needed)
+		this.miniGameUI = null;
 	}
 
 	spawnFish() {
 		// Get all fish types
 		const fishTypeKeys = Object.keys(FishTypes);
 
-		// Spawn 5-8 random fish
-		const fishCount = Phaser.Math.Between(5, 8);
+		// Spawn random fish
+		const fishCount = Phaser.Math.Between(
+			GAME_CONFIG.INITIAL_SPAWN_MIN,
+			GAME_CONFIG.INITIAL_SPAWN_MAX
+		);
 
 		for (let i = 0; i < fishCount; i++) {
 			// Random fish type
@@ -166,14 +275,14 @@ export default class boatScene extends Phaser.Scene {
 	}
 
 	update(time, delta) {
-		// Check for spacebar press
-		if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
-			this.bobber.cast();
-
-			// ============================================
-			// TODO: MINI GAME SECTION - Add your mini game logic here
-			// This is where the fishing mini game will be triggered
-			// ============================================
+		// Check spacebar with proper state tracking
+		if (this.spaceBar.isDown) {
+			if (!this.spaceWasDown) {
+				this.spaceWasDown = true;
+				this.bobber.cast();
+			}
+		} else {
+			this.spaceWasDown = false;
 		}
 
 		// Update bobber
@@ -225,17 +334,31 @@ export default class boatScene extends Phaser.Scene {
 		}
 
 		// Spawn new fish at random intervals
-		if (time >= this.nextSpawnTime && this.fish.length < 12) {
+		if (
+			time >= this.nextSpawnTime &&
+			this.fish.length < GAME_CONFIG.MAX_FISH_COUNT
+		) {
 			this.spawnSingleFish();
-			// Set next spawn time (2-5 seconds from now)
-			this.nextSpawnTime = time + Phaser.Math.Between(2000, 5000);
+			this.nextSpawnTime =
+				time +
+				Phaser.Math.Between(
+					GAME_CONFIG.SPAWN_INTERVAL_MIN,
+					GAME_CONFIG.SPAWN_INTERVAL_MAX
+				);
 		}
 
 		// Remove fish at random intervals
-		if (time >= this.nextDespawnTime && this.fish.length > 3) {
+		if (
+			time >= this.nextDespawnTime &&
+			this.fish.length > GAME_CONFIG.MIN_FISH_COUNT
+		) {
 			this.removeRandomFish();
-			// Set next despawn time (3-7 seconds from now)
-			this.nextDespawnTime = time + Phaser.Math.Between(3000, 7000);
+			this.nextDespawnTime =
+				time +
+				Phaser.Math.Between(
+					GAME_CONFIG.DESPAWN_INTERVAL_MIN,
+					GAME_CONFIG.DESPAWN_INTERVAL_MAX
+				);
 		}
 	}
 }
