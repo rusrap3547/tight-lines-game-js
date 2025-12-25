@@ -200,10 +200,19 @@ export default class boatScene extends Phaser.Scene {
 		this.miniGameUI = null;
 	}
 
-	spawnFish() {
-		// Get all fish types
-		const fishTypeKeys = Object.keys(FishTypes);
+	getWeightedRandomFishType() {
+		// Roll for rare fish first (1% chance for Gar)
+		const rareRoll = Math.random();
+		if (rareRoll < 0.01) {
+			return "Gar";
+		}
 
+		// Otherwise pick from common fish
+		const commonFish = ["Salmon", "Trout", "Bass", "Catfish", "Bluegill"];
+		return Phaser.Math.RND.pick(commonFish);
+	}
+
+	spawnFish() {
 		// Spawn random fish
 		const fishCount = Phaser.Math.Between(
 			GAME_CONFIG.INITIAL_SPAWN_MIN,
@@ -211,8 +220,8 @@ export default class boatScene extends Phaser.Scene {
 		);
 
 		for (let i = 0; i < fishCount; i++) {
-			// Random fish type
-			const randomType = Phaser.Math.RND.pick(fishTypeKeys);
+			// Get weighted random fish type
+			const randomType = this.getWeightedRandomFishType();
 			const fishConfig = FishTypes[randomType];
 
 			// Random position in water
@@ -230,11 +239,8 @@ export default class boatScene extends Phaser.Scene {
 	}
 
 	spawnSingleFish() {
-		// Get all fish types
-		const fishTypeKeys = Object.keys(FishTypes);
-
-		// Random fish type
-		const randomType = Phaser.Math.RND.pick(fishTypeKeys);
+		// Get weighted random fish type
+		const randomType = this.getWeightedRandomFishType();
 		const fishConfig = FishTypes[randomType];
 
 		// Random position in water
@@ -306,7 +312,13 @@ export default class boatScene extends Phaser.Scene {
 					// Add fish points to score
 					this.score += fish.points;
 					this.scoreText.setText("Score: " + this.score);
-					console.log(`Caught ${fish.fishType}! +${fish.points} points`);
+
+					// Special message for rare fish
+					if (fish.fishType === "gar") {
+						console.log(`🎉 LEGENDARY CATCH! Gar! +${fish.points} points`);
+					} else {
+						console.log(`Caught ${fish.fishType}! +${fish.points} points`);
+					}
 
 					// Remove the fish
 					fish.destroy();

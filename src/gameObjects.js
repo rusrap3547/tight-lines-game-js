@@ -155,9 +155,6 @@ export class Bobber {
 // ============================================
 // FISH CLASS
 // ============================================
-// ============================================
-// FISH CLASS
-// ============================================
 export class Fish {
 	constructor(scene, x, y, config = {}) {
 		this.scene = scene;
@@ -270,6 +267,14 @@ export const FishTypes = {
 		points: 5,
 		size: 0.8,
 		fishType: "bluegill",
+	},
+	Gar: {
+		color: 0x880808,
+		speed: 210,
+		health: 20,
+		points: 0,
+		size: 0.7,
+		fishType: "gar",
 	},
 };
 
