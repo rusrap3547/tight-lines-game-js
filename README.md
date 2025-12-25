@@ -145,11 +145,20 @@ DAY_CYCLE_CONFIG = {
 
 ---
 
-### **PHASE 3: Tackle System (Arrow Rhythm Game)**
+### **PHASE 3: Tackle System (Initial Hook + Arrow Rhythm Game)**
 
 **Goal**: Add skill-based fish-catching mechanic after bobber hits a fish
 
-**Mechanics**:
+**Part 1: Initial Hook (Timing Bar)**
+
+- When bobber touches fish, game pauses and timing bar appears
+- Bar marker moves left-to-right across the bar
+- Center zone is the "success zone"
+- Player presses SPACE to attempt hook
+- **Success**: Marker in center → Proceeds to arrow mini-game
+- **Failure**: Marker outside center → Fish escapes, return to fishing
+
+**Part 2: Arrow Rhythm Game** (Only if hook succeeds)
 
 - 4 lanes at top of screen (Left, Down, Up, Right arrows)
 - Arrows fall from top, player must press correct key when arrow reaches bottom
@@ -160,23 +169,35 @@ DAY_CYCLE_CONFIG = {
 
 **Tasks**:
 
-1. [ ] Create tackle game scene/overlay
-2. [ ] Set up 4 vertical lanes for arrows
-3. [ ] Create arrow sprites (or colored rectangles) for each direction
-4. [ ] Implement arrow spawning system
-5. [ ] Add arrow fall speed and timing
-6. [ ] Detect arrow key presses (←, ↓, ↑, →)
-7. [ ] Check if key press matches arrow at hit zone
-8. [ ] Visual feedback for hits/misses (flash lane green/red)
-9. [ ] Fish health bar display
-10. [ ] Countdown timer display
-11. [ ] Win condition: health = 0
-12. [ ] Lose condition: timer = 0
-13. [ ] Transition back to fishing scene with result
+**Initial Hook Tasks:**
+
+1. [ ] Create initial hook timing overlay
+2. [ ] Create timing bar with moving marker
+3. [ ] Define center "success zone" (green highlight)
+4. [ ] Implement marker movement (left-to-right sweep)
+5. [ ] Detect SPACE key press
+6. [ ] Check if marker is in success zone
+7. [ ] Visual feedback (flash green for success, red for miss)
+8. [ ] Transition to arrow game on success
+9. [ ] Return to fishing on failure
+
+**Arrow Game Tasks:** 10. [ ] Create tackle game scene/overlay 11. [ ] Set up 4 vertical lanes for arrows 12. [ ] Create arrow sprites (or colored rectangles) for each direction 13. [ ] Implement arrow spawning system 14. [ ] Add arrow fall speed and timing 15. [ ] Detect arrow key presses (←, ↓, ↑, →) 16. [ ] Check if key press matches arrow at hit zone 17. [ ] Visual feedback for hits/misses (flash lane green/red) 18. [ ] Fish health bar display 19. [ ] Countdown timer display 20. [ ] Win condition: health = 0 21. [ ] Lose condition: timer = 0 22. [ ] Transition back to fishing scene with result
 
 **Config to add**:
 
 ```javascript
+// Initial Hook Timing Config
+HOOK_CONFIG = {
+	BAR_WIDTH: 400,
+	BAR_HEIGHT: 40,
+	MARKER_SPEED: 300, // pixels per second
+	SUCCESS_ZONE_WIDTH: 80, // green center zone
+	SUCCESS_ZONE_COLOR: 0x00ff00,
+	FAIL_ZONE_COLOR: 0xff0000,
+	MARKER_COLOR: 0xffffff,
+};
+
+// Arrow Rhythm Game Config
 TACKLE_CONFIG = {
 	LANE_COUNT: 4,
 	ARROW_KEYS: ["LEFT", "DOWN", "UP", "RIGHT"],
@@ -196,6 +217,23 @@ TACKLE_CONFIG = {
 
 **Visual Design**:
 
+**Initial Hook Screen:**
+
+```
+        HOOK THE FISH!
+
+    ┌──────────────────────┐
+    │░░░░░░░[✓✓✓]░░░░░░░░│  ← Timing bar
+    │         ▲           │
+    │         │           │
+    │       Marker        │
+    └──────────────────────┘
+
+    Press SPACE when in center!
+```
+
+**Arrow Rhythm Game:**
+
 ```
    ←     ↓     ↑     →
    │     │     │     │
@@ -213,7 +251,97 @@ Fish Health: ████░░░░░░ (4/10)    Time: 7s
 
 ---
 
-### **PHASE 4: Story Mode Foundation**
+### **PHASE 4: Boats, Maps & Upgrades System**
+
+**Goal**: Add progression with different boats, maps, and upgradeable equipment
+
+**Boats & Maps**:
+
+- Multiple boats with different capabilities
+- Each boat can access different fishing locations/maps
+- Different maps have unique fish species
+- Upgrade boats to unlock new areas
+
+**Tasks**:
+
+1. [ ] Create boat selection system
+2. [ ] Design map/location system (Lake, River, Ocean, Swamp, etc.)
+3. [ ] Add unique fish species for each location
+4. [ ] Boat upgrade system:
+   - Speed (faster casting/reeling)
+   - Capacity (can catch more fish per trip)
+   - Range (unlocks new maps)
+   - Durability (longer fishing sessions)
+5. [ ] Map unlock progression
+6. [ ] Location-specific visuals (different water colors, backgrounds)
+7. [ ] Travel menu to select location
+8. [ ] Boat garage/selection UI
+
+**Boat Types**:
+
+- **Rowboat**: Starting boat, access to Dock/Lake only
+- **Motorboat**: Medium upgrade, unlocks River and Pond
+- **Fishing Trawler**: High-end, unlocks Ocean and Deep Sea
+- **Swamp Skiff**: Specialty boat for Swamp/Bayou (rare fish like Gar)
+
+**Map Examples**:
+
+- **Dock/Lake**: Common fish (Bluegill, Trout, Bass)
+- **River**: Fast-moving fish (Salmon, Rainbow Trout)
+- **Ocean**: Large saltwater fish (Tuna, Marlin, Swordfish)
+- **Swamp**: Rare/legendary fish (Gar, Alligator Gar, Snakehead)
+- **Deep Sea**: Exotic deep water fish (Anglerfish, Viperfish)
+- **Pond**: Small peaceful fish (Goldfish, Koi, Minnows)
+
+**Upgrade Shop Items**:
+
+- Better fishing rods
+- Enhanced bobbers
+- Special bait types (attracts specific fish)
+- Net upgrades
+- Sonar equipment (shows fish locations)
+
+**Config to add**:
+
+```javascript
+BOAT_TYPES = {
+	rowboat: {
+		name: "Rowboat",
+		cost: 0,
+		speed: 1.0,
+		capacity: 10,
+		unlockedMaps: ["dock", "lake"],
+	},
+	motorboat: {
+		name: "Motorboat",
+		cost: 500,
+		speed: 1.5,
+		capacity: 20,
+		unlockedMaps: ["dock", "lake", "river", "pond"],
+	},
+	// etc...
+};
+
+MAPS = {
+	dock: {
+		name: "Peaceful Dock",
+		background: 0x4a90e2,
+		fishTypes: ["Bluegill", "Trout", "Bass", "Catfish"],
+		rareTypes: [],
+	},
+	swamp: {
+		name: "Murky Swamp",
+		background: 0x3d5c3a,
+		fishTypes: ["Catfish", "Bass"],
+		rareTypes: ["Gar", "AlligatorGar", "Snakehead"],
+	},
+	// etc...
+};
+```
+
+---
+
+### **PHASE 5: Story Mode Foundation**
 
 **Goal**: Add basic quest and progression system
 
@@ -234,10 +362,11 @@ Fish Health: ████░░░░░░ (4/10)    Time: 7s
 - "Catch a Bass" (specific type)
 - "Score 100 points" (points goal)
 - "Complete a perfect catch" (timing goal)
+- "Unlock the Swamp" (buy motorboat & travel to swamp to find rare Gar)
 
 ---
 
-### **PHASE 5: Progression & Upgrades**
+### **PHASE 6: Progression & Upgrades**
 
 **Goal**: Give players something to work toward
 
@@ -253,7 +382,7 @@ Fish Health: ████░░░░░░ (4/10)    Time: 7s
 
 ---
 
-### **PHASE 6: Polish & Content**
+### **PHASE 7: Polish & Content**
 
 **Goal**: Make it look and sound good
 
