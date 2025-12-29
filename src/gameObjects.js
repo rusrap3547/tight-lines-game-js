@@ -26,9 +26,6 @@ const FISH_CONFIG = {
 // ============================================
 // PLAYER CLASS
 // ============================================
-// ============================================
-// PLAYER CLASS
-// ============================================
 export class Player {
 	constructor(scene, x, y, assetKey = null) {
 		this.scene = scene;
@@ -103,8 +100,10 @@ export class Bobber {
 			console.log("CASTING BOBBER");
 			this.isCasting = true;
 			this.hasCaught = false; // Reset catch flag for new cast
+			return true; // Cast was successful
 		} else {
 			console.log("BLOCKED - bobber busy");
+			return false; // Cast was blocked
 		}
 	}
 
@@ -228,38 +227,7 @@ export class Fish {
 // FISH TYPE DEFINITIONS
 // ============================================
 export const FishTypes = {
-	Salmon: {
-		color: 0xff6b9d,
-		speed: 120,
-		health: 4,
-		points: 15,
-		size: 1.2,
-		fishType: "salmon",
-	},
-	Trout: {
-		color: 0x8bc34a,
-		speed: 90,
-		health: 3,
-		points: 10,
-		size: 1.0,
-		fishType: "trout",
-	},
-	Bass: {
-		color: 0x795548,
-		speed: 80,
-		health: 5,
-		points: 20,
-		size: 1.3,
-		fishType: "bass",
-	},
-	Catfish: {
-		color: 0x607d8b,
-		speed: 60,
-		health: 6,
-		points: 25,
-		size: 1.5,
-		fishType: "catfish",
-	},
+	// Common fish
 	Bluegill: {
 		color: 0x03a9f4,
 		speed: 100,
@@ -267,14 +235,133 @@ export const FishTypes = {
 		points: 5,
 		size: 0.8,
 		fishType: "bluegill",
+		isTrash: false,
 	},
+	Trout: {
+		color: 0x8bc34a,
+		speed: 90,
+		health: 3,
+		points: 12,
+		size: 1.0,
+		fishType: "trout",
+		isTrash: false,
+	},
+	Perch: {
+		color: 0xffd700,
+		speed: 95,
+		health: 3,
+		points: 10,
+		size: 0.9,
+		fishType: "perch",
+		isTrash: false,
+	},
+	// Medium fish
+	Salmon: {
+		color: 0xff6b9d,
+		speed: 120,
+		health: 4,
+		points: 18,
+		size: 1.2,
+		fishType: "salmon",
+		isTrash: false,
+	},
+	Bass: {
+		color: 0x795548,
+		speed: 80,
+		health: 5,
+		points: 22,
+		size: 1.3,
+		fishType: "bass",
+		isTrash: false,
+	},
+	Pike: {
+		color: 0x4caf50,
+		speed: 130,
+		health: 5,
+		points: 25,
+		size: 1.4,
+		fishType: "pike",
+		isTrash: false,
+	},
+	// Large/Valuable fish
+	Catfish: {
+		color: 0x607d8b,
+		speed: 60,
+		health: 6,
+		points: 30,
+		size: 1.5,
+		fishType: "catfish",
+		isTrash: false,
+	},
+	Walleye: {
+		color: 0xffeb3b,
+		speed: 110,
+		health: 5,
+		points: 28,
+		size: 1.3,
+		fishType: "walleye",
+		isTrash: false,
+	},
+	// Legendary/Rare fish
 	Gar: {
-		color: 0x880808,
-		speed: 210,
-		health: 20,
+		color: 0xdc143c,
+		speed: 150,
+		health: 7,
+		points: 50,
+		size: 1.8,
+		fishType: "gar",
+		isTrash: false,
+	},
+	Sturgeon: {
+		color: 0x9c27b0,
+		speed: 70,
+		health: 8,
+		points: 75,
+		size: 2.0,
+		fishType: "sturgeon",
+		isTrash: false,
+	},
+};
+
+// ============================================
+// TRASH ITEMS
+// ============================================
+export const TrashItems = {
+	Boot: {
+		color: 0x654321,
+		speed: 50,
+		health: 1,
+		points: 0,
+		size: 1.0,
+		fishType: "boot",
+		isTrash: true,
+	},
+	TinCan: {
+		color: 0xc0c0c0,
+		speed: 70,
+		health: 1,
 		points: 0,
 		size: 0.7,
-		fishType: "gar",
+		fishType: "tin can",
+		isTrash: true,
+	},
+	Seaweed: {
+		color: 0x2e7d32,
+		speed: 40,
+		health: 1,
+		points: 0,
+		size: 0.9,
+		fishType: "seaweed",
+		isTrash: true,
+	},
+	PlasticBag: {
+		color: 0xe0e0e0,
+		speed: 30,
+		health: 1,
+		points: 0,
+		size: 0.8,
+		fishType: "plastic bag",
+		isTrash: true,
 	},
 };
 

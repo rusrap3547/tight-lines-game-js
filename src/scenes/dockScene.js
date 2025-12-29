@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { Player, Bobber, Fish, FishTypes } from "../gameObjects.js";
+import { Player, Bobber, Fish, FishTypes, TrashItems } from "../gameObjects.js";
 
 // ============================================
 // CONFIGURATION CONSTANTS
@@ -23,6 +23,7 @@ const GAME_CONFIG = {
 	SPAWN_INTERVAL_MAX: 5000,
 	DESPAWN_INTERVAL_MIN: 3000,
 	DESPAWN_INTERVAL_MAX: 7000,
+	TRASH_SPAWN_CHANCE: 0.15, // 15% chance to spawn trash instead of fish
 
 	// Colors
 	SKY_COLOR: 0x87ceeb,
@@ -30,6 +31,20 @@ const GAME_CONFIG = {
 	SAND_COLOR: 0xc2b280,
 	DOCK_COLOR: 0x8b4513,
 	DOCK_POST_COLOR: 0x654321,
+};
+
+// ============================================
+// DAY CYCLE CONFIGURATION
+// ============================================
+const DAY_CYCLE_CONFIG = {
+	CASTS_PER_DAY: 10,
+	TIMES_OF_DAY: ["morning", "afternoon", "evening", "night"],
+	SKY_COLORS: {
+		morning: 0x87ceeb, // Light blue
+		afternoon: 0x87cefd, // Bright blue
+		evening: 0xff8c69, // Orange/pink
+		night: 0x1a1a3e, // Dark blue/purple
+	},
 };
 
 // ============================================
@@ -61,14 +76,19 @@ const ASSETS = {
 	},
 };
 
-export default class boatScene extends Phaser.Scene {
+export default class dockScene extends Phaser.Scene {
 	constructor() {
-		super({ key: "BoatScene" });
+		super({ key: "DockScene" });
 
 		// Story mode variables (to be implemented)
 		this.storyMode = false;
 		this.currentLevel = 1;
 		this.questProgress = {};
+
+		// Day cycle tracking
+		this.castCount = 0;
+		this.currentDay = 1;
+		this.timeOfDay = "morning";
 	}
 
 	create() {
@@ -78,14 +98,14 @@ export default class boatScene extends Phaser.Scene {
 		// SCENE SETUP
 		// ============================================
 
-		// Sky at top
-		this.add
+		// Sky at top (will change color based on time of day)
+		this.skyRectangle = this.add
 			.rectangle(
 				0,
 				0,
 				width,
 				height * GAME_CONFIG.SKY_HEIGHT_PERCENT,
-				GAME_CONFIG.SKY_COLOR
+				DAY_CYCLE_CONFIG.SKY_COLORS.morning
 			)
 			.setOrigin(0, 0);
 
@@ -196,20 +216,64 @@ export default class boatScene extends Phaser.Scene {
 			})
 			.setOrigin(0, 0);
 
+		// Day counter UI
+		this.dayText = this.add
+			.text(10, 30, "Day 1 - Morning", {
+				fontSize: "14px",
+				fill: "#fff",
+				fontFamily: "Arial",
+				stroke: "#000",
+				strokeThickness: 3,
+			})
+			.setOrigin(0, 0);
+
+		this.castText = this.add
+			.text(10, 50, "Casts: 0/10", {
+				fontSize: "12px",
+				fill: "#fff",
+				fontFamily: "Arial",
+				stroke: "#000",
+				strokeThickness: 2,
+			})
+			.setOrigin(0, 0);
+
 		// Placeholder for mini-game UI (will be created when needed)
 		this.miniGameUI = null;
 	}
 
 	getWeightedRandomFishType() {
-		// Roll for rare fish first (1% chance for Gar)
-		const rareRoll = Math.random();
-		if (rareRoll < 0.01) {
-			return "Gar";
+		// Roll for trash first
+		const trashRoll = Math.random();
+		if (trashRoll < GAME_CONFIG.TRASH_SPAWN_CHANCE) {
+			// Spawn trash
+			const trashTypes = ["Boot", "TinCan", "Seaweed", "PlasticBag"];
+			return { type: Phaser.Math.RND.pick(trashTypes), isTrash: true };
 		}
 
-		// Otherwise pick from common fish
-		const commonFish = ["Salmon", "Trout", "Bass", "Catfish", "Bluegill"];
-		return Phaser.Math.RND.pick(commonFish);
+		// Roll for legendary fish (2% chance)
+		const legendaryRoll = Math.random();
+		if (legendaryRoll < 0.02) {
+			const legendaryFish = ["Gar", "Sturgeon"];
+			return { type: Phaser.Math.RND.pick(legendaryFish), isTrash: false };
+		}
+
+		// Roll for rare fish (8% chance)
+		const rareRoll = Math.random();
+		if (rareRoll < 0.08) {
+			const rareFish = ["Pike", "Walleye"];
+			return { type: Phaser.Math.RND.pick(rareFish), isTrash: false };
+		}
+
+		// Otherwise pick from common/medium fish
+		const commonFish = [
+			"Bluegill",
+			"Trout",
+			"Perch",
+			"Salmon",
+			"Bass",
+			"Catfish",
+		];
+		return { type: Phaser.Math.RND.pick(commonFish), isTrash: false };
 	}
 
 	spawnFish() {
@@ -221,8 +285,10 @@ export default class boatScene extends Phaser.Scene {
 
 		for (let i = 0; i < fishCount; i++) {
 			// Get weighted random fish type
-			const randomType = this.getWeightedRandomFishType();
-			const fishConfig = FishTypes[randomType];
+			const randomResult = this.getWeightedRandomFishType();
+			const fishConfig = randomResult.isTrash
+				? TrashItems[randomResult.type]
+				: FishTypes[randomResult.type];
 
 			// Random position in water
 			const x = Phaser.Math.Between(this.waterLeft + 50, this.waterRight - 50);
@@ -240,8 +306,10 @@ export default class boatScene extends Phaser.Scene {
 
 	spawnSingleFish() {
 		// Get weighted random fish type
-		const randomType = this.getWeightedRandomFishType();
-		const fishConfig = FishTypes[randomType];
+		const randomResult = this.getWeightedRandomFishType();
+		const fishConfig = randomResult.isTrash
+			? TrashItems[randomResult.type]
+			: FishTypes[randomResult.type];
 
 		// Random position in water
 		const x = Phaser.Math.Between(this.waterLeft + 50, this.waterRight - 50);
@@ -285,7 +353,11 @@ export default class boatScene extends Phaser.Scene {
 		if (this.spaceBar.isDown) {
 			if (!this.spaceWasDown) {
 				this.spaceWasDown = true;
-				this.bobber.cast();
+				if (this.bobber.cast()) {
+					// Cast was successful, increment cast counter
+					this.castCount++;
+					this.updateDayCycle();
+				}
 			}
 		} else {
 			this.spaceWasDown = false;
@@ -309,16 +381,28 @@ export default class boatScene extends Phaser.Scene {
 				if (
 					Phaser.Geom.Intersects.RectangleToRectangle(bobberBounds, fishBounds)
 				) {
-					// Add fish points to score
-					this.score += fish.points;
-					this.scoreText.setText("Score: " + this.score);
-
-					// Special message for rare fish
-					if (fish.fishType === "gar") {
-						console.log(`🎉 LEGENDARY CATCH! Gar! +${fish.points} points`);
+					// Check if it's trash or fish
+					if (fish.fishType && fish.points === 0) {
+						// Trash caught
+						console.log(`🗑️ Caught trash: ${fish.fishType}!`);
+					} else if (fish.fishType === "gar" || fish.fishType === "sturgeon") {
+						// Legendary fish
+						console.log(
+							`🎉 LEGENDARY CATCH! ${fish.fishType}! +${fish.points} points`
+						);
+					} else if (fish.fishType === "pike" || fish.fishType === "walleye") {
+						// Rare fish
+						console.log(
+							`⭐ RARE CATCH! ${fish.fishType}! +${fish.points} points`
+						);
 					} else {
+						// Normal fish
 						console.log(`Caught ${fish.fishType}! +${fish.points} points`);
 					}
+
+					// Add points to score
+					this.score += fish.points;
+					this.scoreText.setText("Score: " + this.score);
 
 					// Remove the fish
 					fish.destroy();
@@ -371,6 +455,43 @@ export default class boatScene extends Phaser.Scene {
 					GAME_CONFIG.DESPAWN_INTERVAL_MIN,
 					GAME_CONFIG.DESPAWN_INTERVAL_MAX
 				);
+		}
+	}
+
+	updateDayCycle() {
+		// Update cast counter display
+		const castsInDay = this.castCount % DAY_CYCLE_CONFIG.CASTS_PER_DAY;
+		this.castText.setText(
+			`Casts: ${castsInDay}/${DAY_CYCLE_CONFIG.CASTS_PER_DAY}`
+		);
+
+		// Calculate current day
+		this.currentDay =
+			Math.floor(this.castCount / DAY_CYCLE_CONFIG.CASTS_PER_DAY) + 1;
+
+		// Determine time of day based on casts within the day
+		if (castsInDay < 3) {
+			this.timeOfDay = "morning";
+		} else if (castsInDay < 5) {
+			this.timeOfDay = "afternoon";
+		} else if (castsInDay < 8) {
+			this.timeOfDay = "evening";
+		} else {
+			this.timeOfDay = "night";
+		}
+
+		// Update sky color based on time of day
+		const newColor = DAY_CYCLE_CONFIG.SKY_COLORS[this.timeOfDay];
+		this.skyRectangle.setFillStyle(newColor);
+
+		// Update day text display
+		const timeOfDayCapitalized =
+			this.timeOfDay.charAt(0).toUpperCase() + this.timeOfDay.slice(1);
+		this.dayText.setText(`Day ${this.currentDay} - ${timeOfDayCapitalized}`);
+
+		// Log day transitions
+		if (castsInDay === 0 && this.castCount > 0) {
+			console.log(`🌅 Day ${this.currentDay} begins!`);
 		}
 	}
 }

@@ -1,6 +1,6 @@
 import Phaser, { Scale } from "phaser";
 import startScene from "./scenes/startScene.js";
-import boatScene from "./scenes/boatScene.js";
+import dockScene from "./scenes/dockScene.js";
 
 const config = {
 	type: Phaser.AUTO,
@@ -16,7 +16,7 @@ const config = {
 			debug: false,
 		},
 	},
-	scene: [startScene, boatScene],
+	scene: [startScene, dockScene],
 	scale: {
 		mode: Phaser.Scale.FIT,
 		autoCenter: Phaser.Scale.CENTER_BOTH,

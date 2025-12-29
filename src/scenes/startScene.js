@@ -42,7 +42,7 @@ export default class startScene extends Phaser.Scene {
 		// Game loop logic here
 		if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
 			console.log("Game started!");
-			this.scene.start("BoatScene");
+			this.scene.start("DockScene");
 		}
 	}
 }

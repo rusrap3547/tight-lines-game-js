@@ -18,17 +18,37 @@ A Phaser 3 fishing game where you sit on a dock and catch fish with timing-based
 
 ### Fish System
 
-- ✅ **5 Fish Types**: Salmon (15pts), Trout (10pts), Bass (20pts), Catfish (25pts), Bluegill (5pts)
+- ✅ **10 Fish Types**:
+  - **Common**: Bluegill (5pts), Trout (12pts), Perch (10pts)
+  - **Medium**: Salmon (18pts), Bass (22pts), Pike (25pts)
+  - **Large**: Catfish (30pts), Walleye (28pts)
+  - **Legendary**: Gar (50pts), Sturgeon (75pts)
+- ✅ **Trash Items**: Boot, Tin Can, Seaweed, Plastic Bag (0 points each)
+- ✅ **Weighted Spawn System**:
+  - 15% chance for trash
+  - 2% chance for legendary fish
+  - 8% chance for rare fish
+  - Rest are common/medium fish
 - ✅ **Dynamic Population**: 3-12 fish at any time
 - ✅ **Auto Spawning**: New fish appear every 2-5 seconds
 - ✅ **Auto Despawning**: Fish disappear every 3-7 seconds (from edges)
 - ✅ **Unique Behaviors**: Each fish type has different speed, size, and color
+
+### Day/Night Cycle System
+
+- ✅ **Cast Counter**: Tracks number of casts made
+- ✅ **Day Progression**: Every 10 casts = 1 day
+- ✅ **Times of Day**: Morning (0-2 casts), Afternoon (3-4), Evening (5-7), Night (8-10)
+- ✅ **Dynamic Sky Colors**: Sky changes color based on time of day
+- ✅ **Day Counter UI**: Displays current day and time of day
+- ✅ **Cast Progress UI**: Shows casts made in current day (X/10)
 
 ### Technical Details
 
 - Game size: 300x180 (scales to 50% of window)
 - Bobber speed: 200 pixels/second
 - All config values at top of files for easy tuning
+- **Assets folder structure created** for future sprites/images/sounds
 
 ---
 
@@ -39,12 +59,17 @@ tight-lines-game-js/
 ├── index.html
 ├── package.json
 ├── style.css
+├── assets/                 # NEW: Asset folder structure
+│   ├── images/            # Backgrounds and UI elements
+│   ├── sprites/           # Player, fish, bobber sprites
+│   ├── sounds/            # Sound effects
+│   └── music/             # Background music
 └── src/
     ├── index.js            # Game config & initialization
     ├── gameObjects.js      # Player, Bobber, Fish classes & types
     └── scenes/
         ├── startScene.js   # Title screen
-        └── boatScene.js    # Main gameplay (fishing)
+        └── dockScene.js    # Main gameplay (fishing)
 ```
 
 **Note**: `miniGame.js` and `storyMode.js` were placeholder files and have been removed. We'll build these from scratch when needed.
@@ -53,7 +78,44 @@ tight-lines-game-js/
 
 ## 🗺️ Development Roadmap
 
-### **PHASE 1: Expand Fish System & Balance** ⬅️ NEXT
+### **PHASE 1: Expand Fish System & Balance** ✅ COMPLETED
+
+**Goal**: Add more fish variety, adjust scoring, and add trash items
+
+**Completed Tasks**:
+
+1. ✅ Reviewed and rebalanced existing fish scores/stats
+2. ✅ Added 4 new fish types (Perch, Pike, Walleye, Sturgeon)
+3. ✅ Added "trash" category items (boot, tin can, seaweed, plastic bag)
+4. ✅ Trash items give 0 points
+5. ✅ Updated fish spawn logic to include trash items
+6. ✅ Set trash spawn rate at 15% chance
+7. ✅ Visual distinction for trash (different colors)
+8. ✅ Console messages for trash/legendary/rare catches
+
+---
+
+### **PHASE 2: Daily Cycle System** ✅ COMPLETED
+
+**Goal**: Add day/night progression based on number of casts
+
+**Completed Tasks**:
+
+1. ✅ Added cast counter to dockScene
+2. ✅ Implemented day progression (every 10 casts = 1 day)
+3. ✅ Added day number display to UI
+4. ✅ Created time-of-day system:
+   - Morning (casts 0-2): Light blue sky
+   - Afternoon (casts 3-4): Bright sky
+   - Evening (casts 5-7): Orange/pink sky
+   - Night (casts 8-10): Dark blue/purple sky
+5. ✅ Sky color changes dynamically based on time of day
+6. ✅ Cast progress UI shows X/10 casts
+7. ✅ Day and time displayed on screen
+
+---
+
+### **PHASE 3: Tackle System (Initial Hook + Arrow Rhythm Game)** ⬅️ NEXT
 
 **Goal**: Add more fish variety, adjust scoring, and add trash items
 
@@ -373,20 +435,26 @@ MAPS = {
 **Tasks**:
 
 1. [ ] Currency system (gold from fish)
-2. [ ] Shop/upgrade menu
-3. [ ] Fishing rod upgrades (cast speed, catch rate)
-4. [ ] Bait system (attracts certain fish)
-5. [ ] Player level/experience
-6. [ ] Achievement system
-7. [ ] Fish encyclopedia (collection tracker)
+2. [ ] Sho3: Tackle System (Hook + Arrow Mini-Game)
 
----
+**Current Progress**: Phases 1 & 2 complete! Fish expanded, trash added, day/night cycle working.
 
-### **PHASE 7: Polish & Content**
+**Next Up**: Implement the tackle mini-game system
 
-**Goal**: Make it look and sound good
+1. Create initial hook timing overlay (timing bar with moving marker)
+2. Implement SPACE key timing check (success = center zone)
+3. On success, transition to arrow rhythm game
+4. Create arrow game scene with 4 lanes
+5. Implement arrow spawning and falling mechanic
+6. Detect arrow key presses and check timing
+7. Add fish health bar and countdown timer
+8. Win/lose conditions and transition back to fishing
 
-**Tasks**:
+**Files to create/modify**:
+
+- Create new scene: `src/scenes/tackleScene.js`
+- Modify: `src/scenes/dockScene.js` (trigger tackle game on fish catch)
+- Modify: `src/index.js` (add tackleScene to game config
 
 1. [ ] Replace placeholder graphics:
    - Player sprite
@@ -411,13 +479,29 @@ MAPS = {
 
 ---
 
-## 🎯 Next Session TODO
+## 🎯 Next Session TODO | Rarity |
 
-**Start here when you pick this up again:**
+| -------- | ----- | ------ | ---- | ------ | ---------- |
+| Bluegill | 100 | 5 | 0.8 | Blue | Common |
+| Perch | 95 | 10 | 0.9 | Gold | Common |
+| Trout | 90 | 12 | 1.0 | Green | Common |
+| Salmon | 120 | 18 | 1.2 | Pink | Medium |
+| Bass | 80 | 22 | 1.3 | Brown | Medium |
+| Pike | 130 | 25 | 1.4 | Green | Rare |
+| Walleye | 110 | 28 | 1.3 | Yellow | Rare |
+| Catfish | 60 | 30 | 1.5 | Gray | Large |
+| Gar | 150 | 50 | 1.8 | Red | Legendary |
+| Sturgeon | 70 | 75 | 2.0 | Purple | Legendary |
 
-### Phase 1: Expand Fish System
+### Trash Items
 
-1. Open `src/gameObjects.js`
+| Item        | Speed | Points | Size | Color |
+| ----------- | ----- | ------ | ---- | ----- |
+| Boot        | 50    | 0      | 1.0  | Brown |
+| Tin Can     | 70    | 0      | 0.7  | Gray  |
+| Seaweed     | 40    | 0      | 0.9  | Green |
+| Plastic Bag | 30    | 0      | 0.8  | Gray  |
+
 2. Review existing fish stats in `FishTypes` object
 3. Decide on new point values for existing fish
 4. Add 3-5 new fish types with unique stats
