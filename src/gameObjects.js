@@ -201,6 +201,11 @@ export class Fish {
 			this.direction *= -1;
 		}
 
+		// Flip sprite to face direction of movement
+		// direction = 1 (right) -> no flip (flipX = false)
+		// direction = -1 (left) -> flip (flipX = true)
+		this.sprite.flipX = this.direction < 0;
+
 		// Update sprite position
 		this.sprite.x = this.x;
 		this.sprite.y = this.y;
@@ -618,6 +623,17 @@ export const TrashItems = {
 		habitat: "both",
 		isTrash: true,
 	},
+	Seaweed: {
+		assetKey: "seaweed",
+		color: 0x2e8b57,
+		speed: 35,
+		health: 1,
+		points: 0,
+		size: 0.9,
+		fishType: "seaweed",
+		habitat: "both",
+		isTrash: true,
+	},
 };
 
 // ============================================
@@ -724,6 +740,39 @@ export const OtherItems = {
 		size: 0.4,
 		fishType: "tadpole",
 		habitat: "freshwater",
+		isTrash: false,
+	},
+	SandDollar: {
+		assetKey: "sand_dollar",
+		color: 0xf5f5dc,
+		speed: 25,
+		health: 1,
+		points: 7,
+		size: 0.7,
+		fishType: "sand dollar",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	Seashell: {
+		assetKey: "seashell",
+		color: 0xfff5ee,
+		speed: 20,
+		health: 1,
+		points: 6,
+		size: 0.6,
+		fishType: "seashell",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	Pearl: {
+		assetKey: "pearl",
+		color: 0xffffff,
+		speed: 15,
+		health: 1,
+		points: 50,
+		size: 0.5,
+		fishType: "pearl",
+		habitat: "saltwater",
 		isTrash: false,
 	},
 };

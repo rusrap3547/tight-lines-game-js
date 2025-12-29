@@ -4,6 +4,23 @@ A Phaser 3 fishing game where you sit on a dock and catch fish with timing-based
 
 ---
 
+## 🎣 How to Play
+
+1. **Press SPACE** to start the game from the title screen
+2. **Press SPACE again** to cast your bobber into the water
+3. The bobber will automatically sink to the bottom and return
+4. **Catch fish** by having your bobber collide with them
+5. Different fish are worth different points:
+   - Small fish (Guppy, Anchovy): 2-5 points
+   - Medium fish (Bass, Salmon): 10-22 points
+   - Large fish (Catfish, Tuna): 25-40 points
+   - Legendary fish (Arowana, Great White Shark): 50-100 points
+6. Watch out for trash items - they give 0 points!
+7. The game progresses through day/night cycles (every 10 casts)
+8. Try to catch as many fish as possible and beat your high score!
+
+---
+
 ## 🎮 Current State (Working)
 
 ### Core Mechanics
@@ -18,12 +35,12 @@ A Phaser 3 fishing game where you sit on a dock and catch fish with timing-based
 
 ### Fish System
 
-- ✅ **10 Fish Types**:
-  - **Common**: Bluegill (5pts), Trout (12pts), Perch (10pts)
-  - **Medium**: Salmon (18pts), Bass (22pts), Pike (25pts)
-  - **Large**: Catfish (30pts), Walleye (28pts)
-  - **Legendary**: Gar (50pts), Sturgeon (75pts)
-- ✅ **Trash Items**: Boot, Tin Can, Seaweed, Plastic Bag (0 points each)
+- ✅ **30+ Fish Types** with unique sprites:
+  - **Freshwater Fish**: 13 types (Guppy, Bass, Salmon, Arowana, etc.)
+  - **Saltwater Fish**: 18 types (Anchovy, Tuna, Great White Shark, etc.)
+  - **Trash Items**: Boot, Tin Can, Seaweed, Plastic Bag (0 points each)
+- ✅ **Fish Images**: All fish now display their own unique sprite images
+- ✅ **Direction Flipping**: Fish sprites flip horizontally to face their movement direction
 - ✅ **Weighted Spawn System**:
   - 15% chance for trash
   - 2% chance for legendary fish
@@ -32,7 +49,7 @@ A Phaser 3 fishing game where you sit on a dock and catch fish with timing-based
 - ✅ **Dynamic Population**: 3-12 fish at any time
 - ✅ **Auto Spawning**: New fish appear every 2-5 seconds
 - ✅ **Auto Despawning**: Fish disappear every 3-7 seconds (from edges)
-- ✅ **Unique Behaviors**: Each fish type has different speed, size, and color
+- ✅ **Unique Behaviors**: Each fish type has different speed, size, points, and visual appearance
 
 ### Day/Night Cycle System
 
