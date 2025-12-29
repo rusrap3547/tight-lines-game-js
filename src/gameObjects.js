@@ -227,98 +227,356 @@ export class Fish {
 // FISH TYPE DEFINITIONS
 // ============================================
 export const FishTypes = {
-	// Common fish
+	// ========== FRESHWATER FISH ==========
+	// Small/Common
+	Guppy: {
+		assetKey: "guppy",
+		color: 0xff6b6b,
+		speed: 120,
+		health: 1,
+		points: 3,
+		size: 0.5,
+		fishType: "guppy",
+		habitat: "freshwater",
+		isTrash: false,
+	},
+	NeonTetra: {
+		assetKey: "neon_tetra",
+		color: 0x00d4ff,
+		speed: 110,
+		health: 1,
+		points: 4,
+		size: 0.6,
+		fishType: "neon tetra",
+		habitat: "freshwater",
+		isTrash: false,
+	},
+	SilverjawMinnow: {
+		assetKey: "silverjaw_minnow",
+		color: 0xc0c0c0,
+		speed: 130,
+		health: 1,
+		points: 2,
+		size: 0.5,
+		fishType: "silverjaw minnow",
+		habitat: "freshwater",
+		isTrash: false,
+	},
+	Goldfish: {
+		assetKey: "goldfish",
+		color: 0xffa500,
+		speed: 85,
+		health: 2,
+		points: 8,
+		size: 0.7,
+		fishType: "goldfish",
+		habitat: "freshwater",
+		isTrash: false,
+	},
 	Bluegill: {
+		assetKey: "bluegill",
 		color: 0x03a9f4,
 		speed: 100,
 		health: 2,
 		points: 5,
 		size: 0.8,
 		fishType: "bluegill",
-		isTrash: false,
-	},
-	Trout: {
-		color: 0x8bc34a,
-		speed: 90,
-		health: 3,
-		points: 12,
-		size: 1.0,
-		fishType: "trout",
+		habitat: "freshwater",
 		isTrash: false,
 	},
 	Perch: {
+		assetKey: "yellow_perch",
 		color: 0xffd700,
 		speed: 95,
 		health: 3,
 		points: 10,
 		size: 0.9,
-		fishType: "perch",
+		fishType: "yellow perch",
+		habitat: "freshwater",
 		isTrash: false,
 	},
-	// Medium fish
+	// Medium
+	Angelfish: {
+		assetKey: "angelfish",
+		color: 0xffb6c1,
+		speed: 75,
+		health: 3,
+		points: 15,
+		size: 1.0,
+		fishType: "angelfish",
+		habitat: "freshwater",
+		isTrash: false,
+	},
+	Carp: {
+		assetKey: "carp",
+		color: 0xcd853f,
+		speed: 70,
+		health: 4,
+		points: 12,
+		size: 1.2,
+		fishType: "carp",
+		habitat: "freshwater",
+		isTrash: false,
+	},
+	Trout: {
+		assetKey: "rainbow_trout",
+		color: 0x8bc34a,
+		speed: 90,
+		health: 3,
+		points: 12,
+		size: 1.0,
+		fishType: "rainbow trout",
+		habitat: "freshwater",
+		isTrash: false,
+	},
 	Salmon: {
+		assetKey: "salmon",
 		color: 0xff6b9d,
 		speed: 120,
 		health: 4,
 		points: 18,
 		size: 1.2,
 		fishType: "salmon",
+		habitat: "freshwater",
 		isTrash: false,
 	},
 	Bass: {
+		assetKey: "bass",
 		color: 0x795548,
 		speed: 80,
 		health: 5,
 		points: 22,
 		size: 1.3,
 		fishType: "bass",
+		habitat: "freshwater",
 		isTrash: false,
 	},
-	Pike: {
-		color: 0x4caf50,
-		speed: 130,
-		health: 5,
-		points: 25,
-		size: 1.4,
-		fishType: "pike",
-		isTrash: false,
-	},
-	// Large/Valuable fish
+	// Large/Valuable
 	Catfish: {
+		assetKey: "catfish",
 		color: 0x607d8b,
 		speed: 60,
 		health: 6,
 		points: 30,
 		size: 1.5,
 		fishType: "catfish",
+		habitat: "freshwater",
 		isTrash: false,
 	},
-	Walleye: {
-		color: 0xffeb3b,
+	// Legendary/Rare
+	Arowana: {
+		assetKey: "arowana",
+		color: 0xffd700,
+		speed: 140,
+		health: 7,
+		points: 60,
+		size: 1.7,
+		fishType: "arowana",
+		habitat: "freshwater",
+		isTrash: false,
+	},
+
+	// ========== SALTWATER FISH ==========
+	// Small/Common
+	Anchovy: {
+		assetKey: "anchovy",
+		color: 0xb0c4de,
+		speed: 140,
+		health: 1,
+		points: 3,
+		size: 0.5,
+		fishType: "anchovy",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	Goby: {
+		assetKey: "goby",
+		color: 0x87ceeb,
+		speed: 100,
+		health: 2,
+		points: 5,
+		size: 0.6,
+		fishType: "goby",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	Clownfish: {
+		assetKey: "clownfish",
+		color: 0xff8c00,
+		speed: 90,
+		health: 2,
+		points: 8,
+		size: 0.7,
+		fishType: "clownfish",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	Seahorse: {
+		assetKey: "seahorse",
+		color: 0xffdab9,
+		speed: 50,
+		health: 2,
+		points: 12,
+		size: 0.8,
+		fishType: "seahorse",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	// Medium
+	BlueAngelfish: {
+		assetKey: "blue_angelfish",
+		color: 0x1e90ff,
+		speed: 80,
+		health: 3,
+		points: 15,
+		size: 1.0,
+		fishType: "blue angelfish",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	YellowTang: {
+		assetKey: "yellow_tang",
+		color: 0xffff00,
+		speed: 95,
+		health: 3,
+		points: 14,
+		size: 0.9,
+		fishType: "yellow tang",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	PurpleTang: {
+		assetKey: "purple_tang",
+		color: 0x9370db,
+		speed: 95,
+		health: 3,
+		points: 16,
+		size: 0.9,
+		fishType: "purple tang",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	Surgeonfish: {
+		assetKey: "surgeonfish",
+		color: 0x4682b4,
+		speed: 100,
+		health: 3,
+		points: 13,
+		size: 1.0,
+		fishType: "surgeonfish",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	Pufferfish: {
+		assetKey: "pufferfish",
+		color: 0xffa07a,
+		speed: 70,
+		health: 4,
+		points: 20,
+		size: 1.1,
+		fishType: "pufferfish",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	Flounder: {
+		assetKey: "flounder",
+		color: 0xd2b48c,
+		speed: 60,
+		health: 4,
+		points: 18,
+		size: 1.2,
+		fishType: "flounder",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	RibbonEel: {
+		assetKey: "ribbon_eel",
+		color: 0x4169e1,
 		speed: 110,
+		health: 4,
+		points: 22,
+		size: 1.3,
+		fishType: "ribbon eel",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	MorayEel: {
+		assetKey: "moray_eel",
+		color: 0x2f4f4f,
+		speed: 90,
+		health: 5,
+		points: 25,
+		size: 1.4,
+		fishType: "moray eel",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	// Large/Valuable
+	BlueGroper: {
+		assetKey: "blue_groper",
+		color: 0x0000cd,
+		speed: 75,
 		health: 5,
 		points: 28,
-		size: 1.3,
-		fishType: "walleye",
+		size: 1.5,
+		fishType: "blue groper",
+		habitat: "saltwater",
 		isTrash: false,
 	},
-	// Legendary/Rare fish
-	Gar: {
-		color: 0xdc143c,
-		speed: 150,
-		health: 7,
-		points: 50,
-		size: 1.8,
-		fishType: "gar",
-		isTrash: false,
-	},
-	Sturgeon: {
-		color: 0x9c27b0,
+	NapoleonWrasse: {
+		assetKey: "napoleon_wrasse",
+		color: 0x20b2aa,
 		speed: 70,
+		health: 6,
+		points: 35,
+		size: 1.6,
+		fishType: "napoleon wrasse",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	Tuna: {
+		assetKey: "tuna",
+		color: 0x191970,
+		speed: 150,
+		health: 5,
+		points: 40,
+		size: 1.4,
+		fishType: "tuna",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	Stingray: {
+		assetKey: "stingray",
+		color: 0x696969,
+		speed: 80,
+		health: 6,
+		points: 45,
+		size: 1.7,
+		fishType: "stingray",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	// Legendary/Rare
+	Anglerfish: {
+		assetKey: "anglerfish",
+		color: 0x4b0082,
+		speed: 50,
+		health: 7,
+		points: 55,
+		size: 1.5,
+		fishType: "anglerfish",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	GreatWhiteShark: {
+		assetKey: "great_white_shark",
+		color: 0x778899,
+		speed: 160,
 		health: 8,
-		points: 75,
-		size: 2.0,
-		fishType: "sturgeon",
+		points: 100,
+		size: 2.5,
+		fishType: "great white shark",
+		habitat: "saltwater",
 		isTrash: false,
 	},
 };
@@ -327,54 +585,192 @@ export const FishTypes = {
 // TRASH ITEMS
 // ============================================
 export const TrashItems = {
-	Boot: {
-		color: 0x654321,
-		speed: 50,
-		health: 1,
-		points: 0,
-		size: 1.0,
-		fishType: "boot",
-		isTrash: true,
-	},
-	TinCan: {
+	RustyCan: {
+		assetKey: "rusty_can",
 		color: 0xc0c0c0,
 		speed: 70,
 		health: 1,
 		points: 0,
 		size: 0.7,
-		fishType: "tin can",
+		fishType: "rusty can",
+		habitat: "both",
 		isTrash: true,
 	},
-	Seaweed: {
-		color: 0x2e7d32,
-		speed: 40,
-		health: 1,
-		points: 0,
-		size: 0.9,
-		fishType: "seaweed",
-		isTrash: true,
-	},
-	PlasticBag: {
-		color: 0xe0e0e0,
-		speed: 30,
+	Bottle: {
+		assetKey: "bottle",
+		color: 0x654321,
+		speed: 50,
 		health: 1,
 		points: 0,
 		size: 0.8,
-		fishType: "plastic bag",
+		fishType: "bottle",
+		habitat: "both",
+		isTrash: true,
+	},
+	AppleCore: {
+		assetKey: "apple_core",
+		color: 0x8b4513,
+		speed: 40,
+		health: 1,
+		points: 0,
+		size: 0.6,
+		fishType: "apple core",
+		habitat: "both",
 		isTrash: true,
 	},
 };
 
+// ============================================
+// OTHER CATCHABLE ITEMS
+// ============================================
+export const OtherItems = {
+	// Crustaceans
+	BlueCrab: {
+		assetKey: "crab_blue",
+		color: 0x1e90ff,
+		speed: 65,
+		health: 3,
+		points: 15,
+		size: 0.9,
+		fishType: "blue crab",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	DungenessCrab: {
+		assetKey: "crab_dungeness",
+		color: 0xcd853f,
+		speed: 60,
+		health: 4,
+		points: 20,
+		size: 1.0,
+		fishType: "dungeness crab",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	KingCrab: {
+		assetKey: "crab_king",
+		color: 0xdc143c,
+		speed: 55,
+		health: 5,
+		points: 35,
+		size: 1.3,
+		fishType: "king crab",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	Shrimp: {
+		assetKey: "shrimp",
+		color: 0xffa07a,
+		speed: 100,
+		health: 1,
+		points: 8,
+		size: 0.5,
+		fishType: "shrimp",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	// Jellyfish
+	Jellyfish: {
+		assetKey: "jellyfish",
+		color: 0xffc0cb,
+		speed: 45,
+		health: 2,
+		points: 10,
+		size: 1.0,
+		fishType: "jellyfish",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	UpsideDownJellyfish: {
+		assetKey: "upside_down_jellyfish",
+		color: 0xdda0dd,
+		speed: 40,
+		health: 2,
+		points: 12,
+		size: 0.9,
+		fishType: "upside down jellyfish",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	// Other Marine Life
+	Starfish: {
+		assetKey: "starfish",
+		color: 0xff6347,
+		speed: 30,
+		health: 2,
+		points: 10,
+		size: 0.8,
+		fishType: "starfish",
+		habitat: "saltwater",
+		isTrash: false,
+	},
+	Mussel: {
+		assetKey: "mussel",
+		color: 0x483d8b,
+		speed: 20,
+		health: 1,
+		points: 5,
+		size: 0.6,
+		fishType: "mussel",
+		habitat: "freshwater",
+		isTrash: false,
+	},
+	Tadpole: {
+		assetKey: "tadpole",
+		color: 0x556b2f,
+		speed: 80,
+		health: 1,
+		points: 3,
+		size: 0.4,
+		fishType: "tadpole",
+		habitat: "freshwater",
+		isTrash: false,
+	},
+};
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+// Get all fish by habitat
+export function getFishByHabitat(habitat) {
+	const allFish = { ...FishTypes, ...OtherItems };
+	return Object.entries(allFish)
+		.filter(
+			([_, config]) => config.habitat === habitat || config.habitat === "both"
+		)
+		.reduce((obj, [key, value]) => {
+			obj[key] = value;
+			return obj;
+		}, {});
+}
+
+// Get random fish from habitat
+export function getRandomFish(habitat) {
+	const fishInHabitat = getFishByHabitat(habitat);
+	const fishKeys = Object.keys(fishInHabitat);
+	const randomKey = fishKeys[Math.floor(Math.random() * fishKeys.length)];
+	return fishInHabitat[randomKey];
+}
+
 /* Usage Example:
 
-Create a salmon
+// Get all freshwater fish
+const freshwaterFish = getFishByHabitat('freshwater');
+
+// Get random freshwater fish
+const randomFish = getRandomFish('freshwater');
+const fish = new Fish(scene, 100, 200, randomFish);
+
+// Create specific fish
 const salmon = new Fish(scene, 100, 200, FishTypes.Salmon);
+const clownfish = new Fish(scene, 300, 200, FishTypes.Clownfish);
+const blueCrab = new Fish(scene, 400, 200, OtherItems.BlueCrab);
 
-Create a trout
-const trout = new Fish(scene, 300, 200, FishTypes.Trout);
+// In dockScene.js:
+const freshwaterFish = getFishByHabitat('freshwater');
 
-Make them swim
-salmon.swim(1);  // swim right
-trout.swim(-1);  // swim left
+// In oceanScene.js:
+const saltwaterFish = getFishByHabitat('saltwater');
 
 */

@@ -52,7 +52,7 @@ const DAY_CYCLE_CONFIG = {
 // ============================================
 const ASSETS = {
 	player: null, // 'assets/player.png'
-	bobber: null, // 'assets/bobber.png'
+	bobber: "worm", // Using worm sprite as bobber/bait
 	dock: null, // 'assets/dock.png'
 	background: null, // 'assets/background.png'
 	// Fish assets
@@ -89,6 +89,11 @@ export default class dockScene extends Phaser.Scene {
 		this.castCount = 0;
 		this.currentDay = 1;
 		this.timeOfDay = "morning";
+	}
+
+	preload() {
+		// Load worm sprite for bobber
+		this.load.image("worm", "assets/sprites/Misc/Worm.png");
 	}
 
 	create() {
