@@ -330,21 +330,27 @@ export default class dockScene extends Phaser.Scene {
 		const trashRoll = Math.random();
 		if (trashRoll < GAME_CONFIG.TRASH_SPAWN_CHANCE) {
 			// Spawn trash
-			const trashTypes = ["Boot", "TinCan", "Seaweed", "PlasticBag"];
+			const trashTypes = ["RustyCan", "Bottle", "AppleCore", "Seaweed"];
 			return { type: Phaser.Math.RND.pick(trashTypes), isTrash: true };
+		}
+
+		// Roll for evil Gar (5% chance)
+		const garRoll = Math.random();
+		if (garRoll < 0.05) {
+			return { type: "Gar", isTrash: false, isHazard: true };
 		}
 
 		// Roll for legendary fish (2% chance)
 		const legendaryRoll = Math.random();
 		if (legendaryRoll < 0.02) {
-			const legendaryFish = ["Gar", "Sturgeon"];
+			const legendaryFish = ["Arowana", "GreatWhiteShark"];
 			return { type: Phaser.Math.RND.pick(legendaryFish), isTrash: false };
 		}
 
 		// Roll for rare fish (8% chance)
 		const rareRoll = Math.random();
 		if (rareRoll < 0.08) {
-			const rareFish = ["Pike", "Walleye"];
+			const rareFish = ["Tuna", "Stingray", "Anglerfish"];
 			return { type: Phaser.Math.RND.pick(rareFish), isTrash: false };
 		}
 
@@ -356,6 +362,11 @@ export default class dockScene extends Phaser.Scene {
 			"Salmon",
 			"Bass",
 			"Catfish",
+			"Guppy",
+			"NeonTetra",
+			"Goldfish",
+			"Angelfish",
+			"Carp",
 		];
 		return { type: Phaser.Math.RND.pick(commonFish), isTrash: false };
 	}
@@ -465,22 +476,35 @@ export default class dockScene extends Phaser.Scene {
 				if (
 					Phaser.Geom.Intersects.RectangleToRectangle(bobberBounds, fishBounds)
 				) {
-					// Check if it's trash or fish
-					if (fish.fishType && fish.points === 0) {
-						// Trash caught
+					// Check if it's an evil Gar
+					if (fish.fishType === "gar") {
+						console.log(`⚠️ EVIL GAR! Watch out! +${fish.points} points`);
+					}
+					// Check if it's trash
+					else if (fish.fishType && fish.points === 0) {
 						console.log(`🗑️ Caught trash: ${fish.fishType}!`);
-					} else if (fish.fishType === "gar" || fish.fishType === "sturgeon") {
-						// Legendary fish
+					}
+					// Check for legendary fish
+					else if (
+						fish.fishType === "arowana" ||
+						fish.fishType === "great white shark"
+					) {
 						console.log(
 							`🎉 LEGENDARY CATCH! ${fish.fishType}! +${fish.points} points`
 						);
-					} else if (fish.fishType === "pike" || fish.fishType === "walleye") {
-						// Rare fish
+					}
+					// Check for rare fish
+					else if (
+						fish.fishType === "tuna" ||
+						fish.fishType === "stingray" ||
+						fish.fishType === "anglerfish"
+					) {
 						console.log(
 							`⭐ RARE CATCH! ${fish.fishType}! +${fish.points} points`
 						);
-					} else {
-						// Normal fish
+					}
+					// Normal fish
+					else {
 						console.log(`Caught ${fish.fishType}! +${fish.points} points`);
 					}
 
