@@ -279,8 +279,11 @@ export default class dockScene extends Phaser.Scene {
 		this.nextSpawnTime = 0;
 		this.nextDespawnTime = 0;
 
-		// Score tracking
-		this.score = 0;
+		// Score tracking - get from registry or start at 0
+		if (!this.registry.has("currentScore")) {
+			this.registry.set("currentScore", 0);
+		}
+		this.score = this.registry.get("currentScore");
 
 		// Mini-game state (for future timing game)
 		this.miniGameActive = false;
@@ -291,7 +294,7 @@ export default class dockScene extends Phaser.Scene {
 		// ============================================
 
 		this.scoreText = this.add
-			.text(10, 10, "Score: 0", {
+			.text(10, 10, "Score: " + this.score, {
 				fontSize: "16px",
 				fill: "#fff",
 				fontFamily: "Arial",
@@ -320,6 +323,33 @@ export default class dockScene extends Phaser.Scene {
 				strokeThickness: 2,
 			})
 			.setOrigin(0, 0);
+
+		// Market button (top-right corner)
+		const marketButton = this.add
+			.rectangle(width - 40, 20, 70, 25, 0xffd700)
+			.setInteractive({ useHandCursor: true });
+
+		const marketButtonText = this.add
+			.text(width - 40, 20, "MARKET", {
+				fontSize: "11px",
+				fill: "#000",
+				fontFamily: "Arial",
+				fontStyle: "bold",
+			})
+			.setOrigin(0.5, 0.5);
+
+		marketButton.on("pointerdown", () => {
+			// Pass current score to market scene
+			this.scene.start("MarketScene", { score: this.score });
+		});
+
+		marketButton.on("pointerover", () => {
+			marketButton.setFillStyle(0xffff00);
+		});
+
+		marketButton.on("pointerout", () => {
+			marketButton.setFillStyle(0xffd700);
+		});
 
 		// Placeholder for mini-game UI (will be created when needed)
 		this.miniGameUI = null;
@@ -510,6 +540,7 @@ export default class dockScene extends Phaser.Scene {
 
 					// Add points to score
 					this.score += fish.points;
+					this.registry.set("currentScore", this.score);
 					this.scoreText.setText("Score: " + this.score);
 
 					// Remove the fish

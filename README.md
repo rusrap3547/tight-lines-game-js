@@ -60,6 +60,23 @@ A Phaser 3 fishing game where you sit on a dock and catch fish with timing-based
 - ✅ **Day Counter UI**: Displays current day and time of day
 - ✅ **Cast Progress UI**: Shows casts made in current day (X/10)
 
+### Market & Upgrade System
+
+- ✅ **Market Scene**: Accessible via button in dock scene
+- ✅ **4 Shops**: Bait Shop, Line Shop, Rod Shop, Fish Buyer
+- ✅ **Money System**: Fish score converts to cash (5% conversion, $1 per 20 points)
+- ✅ **Upgrades**:
+  - **Line Strength**: Increases tackle timer (starts 7s, +2s per level, max 10)
+  - **Bait Quality**: Increases rare fish chance (starts 1%, +5% per level, max 10)
+  - **Rod Power**: Increases fish size multiplier (starts 0.5x, +0.25x per level, max 3.0x)
+- ✅ **Progressive Costs**: Upgrade prices increase with each level (base × 1.5^level)
+- ✅ **Persistent Progress**: Player data saved across scene transitions
+
+### Hazard Fish
+
+- ✅ **Gar (Evil Fish)**: Small, fast (170 speed), worth 0 points, 5% spawn rate
+- ✅ **Future Feature**: Will damage equipment/require new bobber purchase
+
 ### Technical Details
 
 - Game size: 300x180 (scales to 50% of window)
@@ -86,6 +103,7 @@ tight-lines-game-js/
     ├── gameObjects.js      # Player, Bobber, Fish classes & types
     └── scenes/
         ├── startScene.js   # Title screen
+        ├── marketScene.js  # Shop & upgrades
         └── dockScene.js    # Main gameplay (fishing)
 ```
 
@@ -132,7 +150,28 @@ tight-lines-game-js/
 
 ---
 
-### **PHASE 3: Tackle System (Initial Hook + Arrow Rhythm Game)** ⬅️ NEXT
+### **PHASE 2.5: Market & Upgrade System** ✅ COMPLETED
+
+**Goal**: Add marketplace where players can sell fish and buy upgrades
+
+**Completed Tasks**:
+
+1. ✅ Created market scene with ocean/dock background
+2. ✅ Added 4 interactive shops (Bait, Line, Rod, Fish Buyer)
+3. ✅ Implemented money system (5% of fish score converts to cash)
+4. ✅ Fish automatically sold when entering market
+5. ✅ Created upgrade system with 3 upgrade types:
+   - Line Strength: +2s tackle timer per level (starts 7s, max 10 levels)
+   - Bait Quality: +5% rare fish chance per level (starts 1%, max 10 levels)
+   - Rod Power: +0.25x size multiplier per level (starts 0.5x, max 3.0x)
+6. ✅ Progressive cost scaling (base × 1.5^level)
+7. ✅ Shop UI with purchase confirmation and money tracking
+8. ✅ Navigation between market and dock scenes
+9. ✅ Added "Gar" hazard fish (fast, 0 points, future damage mechanic)
+
+---
+
+### **PHASE 3: Tackle System (Initial Hook + Arrow Rhythm Game)** ⬅️ NEXT (POSTPONED)
 
 **Goal**: Add more fish variety, adjust scoring, and add trash items
 
