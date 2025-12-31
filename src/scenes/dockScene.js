@@ -51,7 +51,7 @@ const DAY_CYCLE_CONFIG = {
 // ASSET PLACEHOLDERS - Replace with actual images later
 // ============================================
 const ASSETS = {
-	player: null, // 'assets/player.png'
+	player: "fisherman_idle", // Fisherman sprite
 	bobber: "worm", // Using worm sprite as bobber/bait
 	dock: null, // 'assets/dock.png'
 	background: null, // 'assets/background.png'
@@ -92,6 +92,23 @@ export default class dockScene extends Phaser.Scene {
 	}
 
 	preload() {
+		// Load fisherman spritesheets (48x48 per frame)
+		this.load.spritesheet(
+			"fisherman_idle",
+			"assets/sprites/1 Fisherman/Fisherman_idle.png",
+			{ frameWidth: 48, frameHeight: 48 }
+		);
+		this.load.spritesheet(
+			"fisherman_fish",
+			"assets/sprites/1 Fisherman/Fisherman_fish.png",
+			{ frameWidth: 48, frameHeight: 48 }
+		);
+		this.load.spritesheet(
+			"fisherman_hook",
+			"assets/sprites/1 Fisherman/Fisherman_hook.png",
+			{ frameWidth: 48, frameHeight: 48 }
+		);
+
 		// Load worm sprite for bobber
 		this.load.image("worm", "assets/sprites/Misc/Worm.png");
 
@@ -179,6 +196,43 @@ export default class dockScene extends Phaser.Scene {
 		const { width, height } = this.cameras.main;
 
 		// ============================================
+		// CREATE ANIMATIONS
+		// ============================================
+
+		// Fisherman idle animation
+		this.anims.create({
+			key: "idle",
+			frames: this.anims.generateFrameNumbers("fisherman_idle", {
+				start: 0,
+				end: -1,
+			}),
+			frameRate: 8,
+			repeat: -1,
+		});
+
+		// Fisherman fishing animation
+		this.anims.create({
+			key: "fish",
+			frames: this.anims.generateFrameNumbers("fisherman_fish", {
+				start: 0,
+				end: -1,
+			}),
+			frameRate: 8,
+			repeat: -1,
+		});
+
+		// Fisherman hook animation (catching fish)
+		this.anims.create({
+			key: "hook",
+			frames: this.anims.generateFrameNumbers("fisherman_hook", {
+				start: 0,
+				end: -1,
+			}),
+			frameRate: 10,
+			repeat: 0,
+		});
+
+		// ============================================
 		// SCENE SETUP
 		// ============================================
 
@@ -256,16 +310,36 @@ export default class dockScene extends Phaser.Scene {
 		const sandY = height * (1 - GAME_CONFIG.SAND_HEIGHT_PERCENT);
 		this.bobber = new Bobber(this, bobberX, bobberY, sandY, ASSETS.bobber);
 
+		// Listen for bobber return to play hook animation
+		this.events.on("bobberReturned", () => {
+			if (this.player && this.player.sprite) {
+				this.player.playAnimation("hook");
+				// When hook animation completes, return to idle
+				this.player.sprite.once("animationcomplete-hook", () => {
+					if (this.player && this.player.sprite) {
+						this.player.playAnimation("idle");
+					}
+				});
+			}
+		});
+
 		// ============================================
 		// INPUT SETUP
 		// ============================================
 
-		// Use cursors which includes space
-		this.cursors = this.input.keyboard.createCursorKeys();
-		this.spaceBar = this.input.keyboard.addKey(
-			Phaser.Input.Keyboard.KeyCodes.SPACE
-		);
-		this.spaceWasDown = false;
+		// Mouse click to cast
+		this.input.on("pointerdown", (pointer) => {
+			// Only cast on left click
+			if (pointer.leftButtonDown()) {
+				if (this.bobber.cast()) {
+					// Cast was successful, play fish animation
+					this.player.playAnimation("fish");
+					// Increment cast counter
+					this.castCount++;
+					this.updateDayCycle();
+				}
+			}
+		});
 
 		// Store water boundaries
 		this.waterLeft = 0;
@@ -474,20 +548,6 @@ export default class dockScene extends Phaser.Scene {
 	}
 
 	update(time, delta) {
-		// Check spacebar with proper state tracking
-		if (this.spaceBar.isDown) {
-			if (!this.spaceWasDown) {
-				this.spaceWasDown = true;
-				if (this.bobber.cast()) {
-					// Cast was successful, increment cast counter
-					this.castCount++;
-					this.updateDayCycle();
-				}
-			}
-		} else {
-			this.spaceWasDown = false;
-		}
-
 		// Update bobber
 		this.bobber.update(delta);
 

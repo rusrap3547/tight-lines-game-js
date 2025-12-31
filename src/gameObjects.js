@@ -33,6 +33,12 @@ export class Player {
 		// Use sprite if asset provided, otherwise use placeholder rectangle
 		if (assetKey && scene.textures.exists(assetKey)) {
 			this.sprite = scene.add.sprite(x, y, assetKey).setOrigin(0.5, 1);
+			// Flip to face left
+			this.sprite.setFlipX(true);
+			// Play idle animation if it exists
+			if (scene.anims.exists("idle")) {
+				this.sprite.play("idle");
+			}
 		} else {
 			// Placeholder - simple rectangle
 			this.sprite = scene.add
@@ -53,6 +59,13 @@ export class Player {
 
 	getY() {
 		return this.sprite.y;
+	}
+
+	// Play animation
+	playAnimation(animKey) {
+		if (this.scene.anims.exists(animKey)) {
+			this.sprite.play(animKey);
+		}
 	}
 }
 
@@ -127,6 +140,11 @@ export class Bobber {
 				this.sprite.y = this.startY;
 				this.isReturning = false;
 				this.hasCaught = false; // Reset catch flag when back at start
+
+				// Trigger hook animation event
+				if (this.scene.events) {
+					this.scene.events.emit("bobberReturned");
+				}
 			}
 		}
 
