@@ -6,8 +6,8 @@ A Phaser 3 fishing game where you sit on a dock and catch fish with timing-based
 
 ## 🎣 How to Play
 
-1. **Press SPACE** to start the game from the title screen
-2. **Press SPACE again** to cast your bobber into the water
+1. **Click anywhere** to start the game from the title screen
+2. **Click again** to cast your bobber into the water
 3. The bobber will automatically sink to the bottom and return
 4. **Catch fish** by having your bobber collide with them
 5. Different fish are worth different points:
@@ -25,11 +25,12 @@ A Phaser 3 fishing game where you sit on a dock and catch fish with timing-based
 
 ### Core Mechanics
 
-- ✅ **Start Scene**: Title screen with "Press SPACE to Start"
+- ✅ **Start Scene**: Title screen with click to start
 - ✅ **Main Fishing Scene**: Player on dock, bobber in water
-- ✅ **Casting Mechanic**: Press SPACE to cast bobber down to sand
+- ✅ **Animated Fisherman**: Sprite animations for idle, fishing, and hooking
+- ✅ **Casting Mechanic**: Left click to cast bobber down to sand
 - ✅ **Auto-Return**: Bobber automatically returns after reaching bottom
-- ✅ **Repeated Casts**: Spacebar works multiple times without needing to refocus window
+- ✅ **Smooth Input**: Mouse click works perfectly without focus issues
 - ✅ **Collision Detection**: Bobber catches fish on contact
 - ✅ **Score System**: Points awarded based on fish type
 
@@ -80,8 +81,13 @@ A Phaser 3 fishing game where you sit on a dock and catch fish with timing-based
 ### Technical Details
 
 - Game size: 300x180 (scales to 50% of window)
-- Bobber speed: 200 pixels/second
+- Input: Left mouse click
 - All config values at top of files for easy tuning
+- **Assets folder structure**:
+  - Fisherman sprite animations (idle, fish, hook)
+  - 30+ unique fish sprites
+  - Arrow assets for future minigame
+  - Environment objects (boats, pier, fishing hut)
 - **Assets folder structure created** for future sprites/images/sounds
 
 ---
