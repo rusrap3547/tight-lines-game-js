@@ -37,7 +37,7 @@ const GAME_CONFIG = {
 // DAY CYCLE CONFIGURATION
 // ============================================
 const DAY_CYCLE_CONFIG = {
-	CASTS_PER_DAY: 10,
+	CASTS_PER_DAY: 15,
 	TIMES_OF_DAY: ["morning", "afternoon", "evening", "night"],
 	SKY_COLORS: {
 		morning: 0x87ceeb, // Light blue
@@ -89,6 +89,14 @@ export default class dockScene extends Phaser.Scene {
 		this.castCount = 0;
 		this.currentDay = 1;
 		this.timeOfDay = "morning";
+	}
+
+	init(data) {
+		// Handle return from minigame or market
+		if (data && data.score !== undefined) {
+			this.score = data.score;
+			this.registry.set("currentScore", this.score);
+		}
 	}
 
 	preload() {
@@ -327,11 +335,16 @@ export default class dockScene extends Phaser.Scene {
 		// INPUT SETUP
 		// ============================================
 
-		// Mouse click to cast
+		// Mouse click to cast OR interact with minigame
 		this.input.on("pointerdown", (pointer) => {
-			// Only cast on left click
+			// Only handle left click
 			if (pointer.leftButtonDown()) {
-				if (this.bobber.cast()) {
+				// If minigame is active, check timing
+				if (this.miniGameActive) {
+					this.checkMiniGameTiming();
+				}
+				// Otherwise try to cast
+				else if (this.bobber.cast()) {
 					// Cast was successful, play fish animation
 					this.player.playAnimation("fish");
 					// Increment cast counter
@@ -362,6 +375,7 @@ export default class dockScene extends Phaser.Scene {
 		// Mini-game state (for future timing game)
 		this.miniGameActive = false;
 		this.miniGameSuccess = false;
+		this.currentFishCaught = null; // Store fish that triggered minigame
 
 		// ============================================
 		// UI ELEMENTS
@@ -548,6 +562,31 @@ export default class dockScene extends Phaser.Scene {
 	}
 
 	update(time, delta) {
+		// Update minigame marker if active
+		if (this.miniGameActive && this.miniGameUI) {
+			const marker = this.miniGameUI.marker;
+			const barLeft = this.miniGameUI.barX - this.miniGameUI.barWidth / 2;
+			const barRight = this.miniGameUI.barX + this.miniGameUI.barWidth / 2;
+
+			// Move marker
+			marker.x +=
+				this.miniGameUI.markerDirection *
+				this.miniGameUI.markerSpeed *
+				(delta / 1000);
+
+			// Bounce at edges
+			if (marker.x <= barLeft && this.miniGameUI.markerDirection === -1) {
+				this.miniGameUI.markerDirection = 1;
+				marker.x = barLeft;
+			} else if (
+				marker.x >= barRight &&
+				this.miniGameUI.markerDirection === 1
+			) {
+				this.miniGameUI.markerDirection = -1;
+				marker.x = barRight;
+			}
+		}
+
 		// Update bobber
 		this.bobber.update(delta);
 
@@ -566,49 +605,15 @@ export default class dockScene extends Phaser.Scene {
 				if (
 					Phaser.Geom.Intersects.RectangleToRectangle(bobberBounds, fishBounds)
 				) {
-					// Check if it's an evil Gar
-					if (fish.fishType === "gar") {
-						console.log(`⚠️ EVIL GAR! Watch out! +${fish.points} points`);
-					}
-					// Check if it's trash
-					else if (fish.fishType && fish.points === 0) {
-						console.log(`🗑️ Caught trash: ${fish.fishType}!`);
-					}
-					// Check for legendary fish
-					else if (
-						fish.fishType === "arowana" ||
-						fish.fishType === "great white shark"
-					) {
-						console.log(
-							`🎉 LEGENDARY CATCH! ${fish.fishType}! +${fish.points} points`
-						);
-					}
-					// Check for rare fish
-					else if (
-						fish.fishType === "tuna" ||
-						fish.fishType === "stingray" ||
-						fish.fishType === "anglerfish"
-					) {
-						console.log(
-							`⭐ RARE CATCH! ${fish.fishType}! +${fish.points} points`
-						);
-					}
-					// Normal fish
-					else {
-						console.log(`Caught ${fish.fishType}! +${fish.points} points`);
-					}
+					// Store the fish and trigger minigame
+					this.currentFishCaught = fish;
 
-					// Add points to score
-					this.score += fish.points;
-					this.registry.set("currentScore", this.score);
-					this.scoreText.setText("Score: " + this.score);
+					// Stop the bobber movement
+					this.bobber.isCasting = false;
+					this.bobber.isReturning = false;
 
-					// Remove the fish
-					fish.destroy();
-					this.fish.splice(i, 1);
-
-					// Mark that a fish has been caught this cast
-					this.bobber.hasCaught = true;
+					// Start the hook timing minigame
+					this.startMiniGame(fish);
 
 					break; // Only catch one fish per cast
 				}
@@ -668,12 +673,13 @@ export default class dockScene extends Phaser.Scene {
 		this.currentDay =
 			Math.floor(this.castCount / DAY_CYCLE_CONFIG.CASTS_PER_DAY) + 1;
 
-		// Determine time of day based on casts within the day
-		if (castsInDay < 3) {
+		// Determine time of day based on casts within the day (15 casts divided evenly)
+		// Morning: 0-3 (4 casts), Afternoon: 4-7 (4 casts), Evening: 8-11 (4 casts), Night: 12-14 (3 casts)
+		if (castsInDay < 4) {
 			this.timeOfDay = "morning";
-		} else if (castsInDay < 5) {
-			this.timeOfDay = "afternoon";
 		} else if (castsInDay < 8) {
+			this.timeOfDay = "afternoon";
+		} else if (castsInDay < 12) {
 			this.timeOfDay = "evening";
 		} else {
 			this.timeOfDay = "night";
@@ -688,9 +694,189 @@ export default class dockScene extends Phaser.Scene {
 			this.timeOfDay.charAt(0).toUpperCase() + this.timeOfDay.slice(1);
 		this.dayText.setText(`Day ${this.currentDay} - ${timeOfDayCapitalized}`);
 
-		// Log day transitions
+		// Check if day is complete (reached 15 casts)
 		if (castsInDay === 0 && this.castCount > 0) {
 			console.log(`🌅 Day ${this.currentDay} begins!`);
+			// Go to market scene to start new day
+			this.scene.start("MarketScene", { score: this.score });
 		}
+	}
+
+	// ============================================
+	// HOOK TIMING MINIGAME
+	// ============================================
+
+	startMiniGame(fish) {
+		const { width, height } = this.cameras.main;
+
+		// Set minigame active
+		this.miniGameActive = true;
+		this.miniGameSuccess = false;
+
+		// Create semi-transparent overlay
+		const overlay = this.add
+			.rectangle(0, 0, width, height, 0x000000, 0.5)
+			.setOrigin(0, 0)
+			.setDepth(100);
+
+		// Create popup container in center of screen
+		const popupWidth = 200;
+		const popupHeight = 80;
+		const popupX = width / 2;
+		const popupY = height / 2;
+
+		// Popup background
+		const popup = this.add
+			.rectangle(popupX, popupY, popupWidth, popupHeight, 0x333333)
+			.setStrokeStyle(3, 0xffffff)
+			.setDepth(101);
+
+		// Title text
+		const titleText = this.add
+			.text(popupX, popupY - 25, "HOOK IT!", {
+				fontSize: "14px",
+				fill: "#ffff00",
+				fontFamily: "Arial",
+				fontStyle: "bold",
+			})
+			.setOrigin(0.5)
+			.setDepth(102);
+
+		// Timing bar background (container for the marker)
+		const barWidth = 160;
+		const barHeight = 20;
+		const barX = popupX;
+		const barY = popupY + 5;
+
+		const barBackground = this.add
+			.rectangle(barX, barY, barWidth, barHeight, 0x555555)
+			.setStrokeStyle(2, 0xffffff)
+			.setDepth(102);
+
+		// Success zone (middle of bar) - green zone
+		const successZoneWidth = 40;
+		const successZone = this.add
+			.rectangle(barX, barY, successZoneWidth, barHeight, 0x00ff00, 0.5)
+			.setDepth(103);
+
+		// Moving marker (red circle)
+		const markerRadius = 8;
+		const marker = this.add
+			.circle(barX - barWidth / 2 + markerRadius, barY, markerRadius, 0xff0000)
+			.setDepth(104);
+
+		// Calculate marker speed based on fish speed
+		// Base speed is 150, but scales with fish speed (multiplier of 1.5 for challenge)
+		const baseMarkerSpeed = 150;
+		const fishSpeedMultiplier = 1.5;
+		const markerSpeed = baseMarkerSpeed + fish.speed * fishSpeedMultiplier;
+
+		// Store minigame UI references
+		this.miniGameUI = {
+			overlay,
+			popup,
+			titleText,
+			barBackground,
+			successZone,
+			marker,
+			barWidth,
+			barX,
+			barY,
+			successZoneWidth,
+			markerDirection: 1, // 1 = moving right, -1 = moving left
+			markerSpeed: markerSpeed, // pixels per second (scales with fish speed)
+		};
+	}
+
+	checkMiniGameTiming() {
+		if (!this.miniGameUI || !this.currentFishCaught) return;
+
+		const marker = this.miniGameUI.marker;
+		const successZone = this.miniGameUI.successZone;
+		const fish = this.currentFishCaught;
+
+		// Get bounds
+		const markerX = marker.x;
+		const successLeft = successZone.x - this.miniGameUI.successZoneWidth / 2;
+		const successRight = successZone.x + this.miniGameUI.successZoneWidth / 2;
+
+		// Check if marker is within success zone
+		const success = markerX >= successLeft && markerX <= successRight;
+
+		if (success) {
+			// SUCCESS! Hook the fish
+			this.miniGameSuccess = true;
+
+			// Show success feedback
+			this.miniGameUI.titleText.setText("SUCCESS!");
+			this.miniGameUI.titleText.setColor("#00ff00");
+
+			// Prepare fish data for minigame
+			const fishData = {
+				health: fish.health,
+				fishType: fish.fishType,
+				points: fish.points,
+				size: fish.size,
+			};
+
+			// Remove the fish from this scene
+			const fishIndex = this.fish.indexOf(fish);
+			if (fishIndex >= 0) {
+				fish.destroy();
+				this.fish.splice(fishIndex, 1);
+			}
+
+			// Mark that a fish has been caught this cast
+			this.bobber.hasCaught = true;
+
+			// Close minigame popup and transition to rhythm minigame
+			this.time.delayedCall(800, () => {
+				this.closeMiniGame();
+
+				// Launch rhythm minigame scene
+				this.scene.launch("Minigame", {
+					fish: fishData,
+					score: this.score,
+				});
+
+				// Pause dock scene while minigame is active
+				this.scene.pause();
+			});
+
+			// Early return - don't close minigame immediately
+			return;
+		} else {
+			// FAIL! Fish got away
+			console.log("❌ Fish got away! Missed the timing!");
+
+			this.miniGameUI.titleText.setText("MISSED!");
+			this.miniGameUI.titleText.setColor("#ff0000");
+		}
+
+		// Close minigame after short delay
+		this.time.delayedCall(500, () => {
+			this.closeMiniGame();
+
+			// Resume bobber return to dock
+			this.bobber.isReturning = true;
+		});
+	}
+
+	closeMiniGame() {
+		if (this.miniGameUI) {
+			// Destroy all UI elements
+			this.miniGameUI.overlay.destroy();
+			this.miniGameUI.popup.destroy();
+			this.miniGameUI.titleText.destroy();
+			this.miniGameUI.barBackground.destroy();
+			this.miniGameUI.successZone.destroy();
+			this.miniGameUI.marker.destroy();
+
+			this.miniGameUI = null;
+		}
+
+		// Reset minigame state
+		this.miniGameActive = false;
+		this.currentFishCaught = null;
 	}
 }

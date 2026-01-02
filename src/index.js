@@ -2,6 +2,7 @@ import Phaser, { Scale } from "phaser";
 import startScene from "./scenes/startScene.js";
 import dockScene from "./scenes/dockScene.js";
 import marketScene from "./scenes/marketScene.js";
+import Minigame from "./scenes/minigame.js";
 
 const config = {
 	type: Phaser.AUTO,
@@ -17,7 +18,7 @@ const config = {
 			debug: false,
 		},
 	},
-	scene: [startScene, marketScene, dockScene],
+	scene: [startScene, marketScene, dockScene, Minigame],
 	scale: {
 		mode: Phaser.Scale.FIT,
 		autoCenter: Phaser.Scale.CENTER_BOTH,

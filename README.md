@@ -1,31 +1,83 @@
-# Tight Lines - Fishing Game
+# 🎣 Tight Lines - Fishing Game
 
-A Phaser 3 fishing game where you sit on a dock and catch fish with timing-based mechanics.
+A Phaser 3 fishing game featuring a two-stage skill-based catching system: hook timing and DDR-style rhythm minigame. Catch fish, upgrade your equipment, and progress through day/night cycles!
 
 ---
 
 ## 🎣 How to Play
 
-1. **Click anywhere** to start the game from the title screen
+### Fishing Mechanics
+
+1. **Click anywhere** to start from the title screen
 2. **Click again** to cast your bobber into the water
-3. The bobber will automatically sink to the bottom and return
-4. **Catch fish** by having your bobber collide with them
-5. Different fish are worth different points:
-   - Small fish (Guppy, Anchovy): 2-5 points
-   - Medium fish (Bass, Salmon): 10-22 points
-   - Large fish (Catfish, Tuna): 25-40 points
-   - Legendary fish (Arowana, Great White Shark): 50-100 points
-6. Watch out for trash items - they give 0 points!
-7. The game progresses through day/night cycles (every 10 casts)
-8. Try to catch as many fish as possible and beat your high score!
+3. The bobber automatically sinks and returns
+4. When the bobber touches a fish, **Stage 1: Hook Timing** begins
 
----
+### Stage 1: Hook Timing (Bar Minigame)
 
-## 🎮 Current State (Working)
+- A popup appears with a timing bar
+- A red marker moves back and forth across the bar
+- **Click** when the marker is in the **green success zone** (center)
+- ✅ **Success**: Proceeds to Stage 2 (Rhythm Minigame)
+- ❌ **Failure**: Fish escapes, bobber returns to dock
 
-### Core Mechanics
+### Stage 2: Rhythm Minigame (DDR Style)
+
+- Right half of screen shows 4 lanes with falling arrows
+- Arrows fall Features
+
+### Core Fishing Mechanics
 
 - ✅ **Start Scene**: Title screen with click to start
+- ✅ **Dock Scene**: Player on dock with animated fisherman
+- ✅ **Fisherman Animations**: Idle, fishing, and hooking sprites
+- ✅ **Click to Cast**: Cast bobber with mouse click
+- ✅ **Auto-Return**: Bobber automatically sinks and returns
+- ✅ **Collision Detection**: Bobber triggers minigames on fish contact
+- ✅ **Score System**: Points based on fish type and rarity
+
+### Two-Stage Catching System
+
+- ✅ **Hook Timing Minigame**:
+  - Popup with moving marker on timing bar
+  - Click when marker is in green zone
+  - Success proceeds to rhythm game
+  - Failure causes fish to escape
+  - Marker speed scales with fish speed (faster fish = harder timing)
+- ✅ **Rhythm Minigame (DDR Style)**:
+  - Right half screen layout
+  - 4 lanes with falling arrows
+  - Arrow Keys (←, ↑, ↓, →) or WASD controls
+  - Number of arrows based on fish health
+  - 7-second timer with -0.5s penalties
+  - Visual feedback for hits/misses
+  - Success counter shows progress
+  - Win = catch fish, Lose = fish escapesoints
+- Trash items: 0 points
+
+### Day/Night Cycle
+
+- Each day = 15 casts
+- ✅ **15 Casts Per Day**: Evenly distributed across times
+- ✅ **Four Times of Day**:
+  - Morning (0-3 casts): Light blue sky
+  - Afternoon (4-7 casts): Bright blue sky
+  - Evening (8-11 casts): Orange/pink sky
+  - Night (12-14 casts): Dark purple sky
+- ✅ **Dynamic Sky Colors**: Real-time color transitions
+- ✅ **UI Display**: Shows "Day X - Time" and "Casts: X/15"
+- ✅ **Auto Market Transition**: After 15 casts, goes to market to start new day
+- ✅ **Market Scene**: Accessible via button or auto-transition after 15 casts
+- ✅ **4 Shops**: Bait Shop, Line Shop, Rod Shop, Fish Buyer
+- ✅ **Money System**: 1 fish point = $1 in cash
+- ✅ **Auto Fish Sale**: Fish automatically sold when entering market
+- ✅ **Three Upgrade Types**:
+  - **Line Strength**: +2s rhythm timer per level (max 10 levels)
+  - **Bait Quality**: +5% rare fish chance per level (max 10 levels)
+  - **Rod Power**: +0.25x size multiplier per level (max 3 levels)
+- ✅ **Progressive Costs**: Base price × 1.5^level
+- ✅ **Persistent Data**: Money and upgrades saved in registry
+- ✅ **Return to Dock**: Click "Return to Dock" to continue fishing
 - ✅ **Main Fishing Scene**: Player on dock, bobber in water
 - ✅ **Animated Fisherman**: Sprite animations for idle, fishing, and hooking
 - ✅ **Casting Mechanic**: Left click to cast bobber down to sand
@@ -33,15 +85,16 @@ A Phaser 3 fishing game where you sit on a dock and catch fish with timing-based
 - ✅ **Smooth Input**: Mouse click works perfectly without focus issues
 - ✅ **Collision Detection**: Bobber catches fish on contact
 - ✅ **Score System**: Points awarded based on fish type
-
-### Fish System
-
-- ✅ **30+ Fish Types** with unique sprites:
-  - **Freshwater Fish**: 13 types (Guppy, Bass, Salmon, Arowana, etc.)
-  - **Saltwater Fish**: 18 types (Anchovy, Tuna, Great White Shark, etc.)
-  - **Trash Items**: Boot, Tin Can, Seaweed, Plastic Bag (0 points each)
-- ✅ **Fish Images**: All fish now display their own unique sprite images
-- ✅ **Direction Flipping**: Fish sprites flip horizontally to face their movement direction
+  **Game Size**: 300x180 base (scales to 50% of window)
+- **Engine**: Phaser 3 with Arcade Physics
+- **Input**: Mouse click + Arrow Keys/WASD
+- **Scenes**: Start → Dock → Minigame ⟷ Market
+- **Assets**:
+  - Fisherman sprite animations (idle, fish, hook)
+  - 30+ unique fish sprites
+  - Arrow images for rhythm minigame
+  - Environment objects
+- **Data Persistence**: Phaser Registry for score, money, upgradeeir movement direction
 - ✅ **Weighted Spawn System**:
   - 15% chance for trash
   - 2% chance for legendary fish
@@ -63,52 +116,115 @@ A Phaser 3 fishing game where you sit on a dock and catch fish with timing-based
 
 ### Market & Upgrade System
 
-- ✅ **Market Scene**: Accessible via button in dock scene
+dockScene.js # Main fishing gameplay
+├── minigame.js # Rhythm minigame (DDR style)
+└── marketScene.js # Shop & upgradescene
+
 - ✅ **4 Shops**: Bait Shop, Line Shop, Rod Shop, Fish Buyer
-- ✅ **Money System**: Fish score converts to cash (5% conversion, $1 per 20 points)
-- ✅ **Upgrades**:
-  - **Line Strength**: Increases tackle timer (starts 7s, +2s per level, max 10)
-  - **Bait Quality**: Increases rare fish chance (starts 1%, +5% per level, max 10)
-  - **Rod Power**: Increases fish size multiplier (starts 0.5x, +0.25x per level, max 3.0x)
-- ✅ **Progressive Costs**: Upgrade prices increase with each level (base × 1.5^level)
-- ✅ **Persistent Progress**: Player data saved across scene transitions
-
-### Hazard Fish
-
-- ✅ **Gar (Evil Fish)**: Small, fast (170 speed), worth 0 points, 5% spawn rate
-- ✅ **Future Feature**: Will damage equipment/require new bobber purchase
-
-### Technical Details
-
-- Game size: 300x180 (scales to 50% of window)
-- Input: Left mouse click
-- All config values at top of files for easy tuning
-- **Assets folder structure**:
-  - Fisherman sprite animations (idle, fish, hook)
-  - 30+ unique fish sprites
-  - Arrow assets for future minigame
-  - Environment objects (boats, pier, fishing hut)
-- **Assets folder structure created** for future sprites/images/sounds
 
 ---
 
-## 📁 Project Structure
+## 🎯 Game Flow
+
+---
+
+## ⚙️ Configuration
+
+### Hook Timing Settings
+
+Located in `dockScene.js`:
+
+```javascript
+// Marker speed calculation
+markerSpeed = 150 + (fish.speed × 1.5)
+successZoneWidth = 40px
+barWidth = 160px
+```
+
+### Rhythm Minigame Settings
+
+Located in `minigame.js`:
+
+```javascript
+MINIGAME_CONFIG = {
+	INITIAL_TIME: 7, // Starting seconds
+	MISS_PENALTY: 0.5, // Time lost per miss
+	ARROW_SPEED: 100, // Pixels per second
+	HIT_THRESHOLD: 25, // Hit detection margin
+	LANE_SPACING: 40, // Space between lanes
+};
+```
+
+### Day Cycle Settings
+
+Located in `dockScene.js`:
+
+```javascript
+DAY_CYCLE_CONFIG = {
+	CASTS_PER_DAY: 15,
+	TIMES_OF_DAY: ["morning", "afternoon", "evening", "night"],
+	// Morning: 0-3, Afternoon: 4-7, Evening: 8-11, Night: 12-14
+};
+```
+
+### Fish Spawn Settings
+
+Located in `dockScene.js`:
+
+```javascript
+GAME_CONFIG = {
+  MIN_FISH_COUNT: 3,
+  MAX_FISH_COUNT: 12,
+  SPAWN_INTERVAL: 2000-5000ms,
+  TRASH_SPAWN_CHANCE: 0.15,  // 15%
+}
+```
+
+---
 
 ```
-tight-lines-game-js/
-├── index.html
-├── package.json
-├── style.css
-├── assets/                 # NEW: Asset folder structure
-│   ├── images/            # Backgrounds and UI elements
-│   ├── sprites/           # Player, fish, bobber sprites
-│   ├── sounds/            # Sound effects
-│   └── music/             # Background music
-└── src/
-    ├── index.js            # Game config & initialization
-    ├── gameObjects.js      # Player, Bobber, Fish classes & types
-    └── scenes/
-        ├── startScene.js   # Title screen
+Start Scene
+    ↓ (Click to Start)
+Dock Scene (Fishing)
+    ↓ (Cast bobber)
+Bobber hits fish
+    ↓
+Hook Timing Popup
+    ↓ (Success?)
+   YES → Rhythm Minigame
+           ↓ (Complete arrows?)
+          YES → Fish Caught! (+Points)
+          NO → Fish EscapedHook + Rhythm Minigame)** ✅ COMPLETED
+    NO → Fish Escaped
+    ↓Create two-stage skill-based catching mechanic
+
+**Completed Tasks**:
+
+**Hook Timing Minigame:**
+1. ✅ Created hook timing popup overlay
+2. ✅ Implemented timing bar with moving marker
+3. ✅ Added green success zone in center
+4. ✅ Marker speed scales with fish speed (faster fish = harder)
+5. ✅ Click detection for hook attempt
+6. ✅ Success/failure visual feedback
+7. ✅ Transition to rhythm game on success
+8. ✅ Fish escapes on failure
+
+**Rhythm Minigame (DDR Style):**
+9. ✅ Created dedicated minigame scene
+10. ✅ Right half screen layout
+11. ✅ 4 vertical lanes with hollow arrow markers
+12. ✅ Falling arrow system with sprites
+13. ✅ Arrow key detection (←, ↑, ↓, →)
+14. ✅ WASD alternative controls (A, W, S, D)
+15. ✅ Hit detection with forgiveness threshold
+16. ✅ Visual feedback (green flash on hit, red on miss)
+17. ✅ Fish health/arrow counter display
+18. ✅ Countdown timer with miss penalties
+19. ✅ Win condition: Hit all arrows before time expires
+20. ✅ Lose condition: Time runs out
+21. ✅ Return to dock scene with results
+22. ✅ Score updates only on successful catch     ├── startScene.js   # Title screen
         ├── marketScene.js  # Shop & upgrades
         └── dockScene.js    # Main gameplay (fishing)
 ```
@@ -133,145 +249,6 @@ tight-lines-game-js/
 6. ✅ Set trash spawn rate at 15% chance
 7. ✅ Visual distinction for trash (different colors)
 8. ✅ Console messages for trash/legendary/rare catches
-
----
-
-### **PHASE 2: Daily Cycle System** ✅ COMPLETED
-
-**Goal**: Add day/night progression based on number of casts
-
-**Completed Tasks**:
-
-1. ✅ Added cast counter to dockScene
-2. ✅ Implemented day progression (every 10 casts = 1 day)
-3. ✅ Added day number display to UI
-4. ✅ Created time-of-day system:
-   - Morning (casts 0-2): Light blue sky
-   - Afternoon (casts 3-4): Bright sky
-   - Evening (casts 5-7): Orange/pink sky
-   - Night (casts 8-10): Dark blue/purple sky
-5. ✅ Sky color changes dynamically based on time of day
-6. ✅ Cast progress UI shows X/10 casts
-7. ✅ Day and time displayed on screen
-
----
-
-### **PHASE 2.5: Market & Upgrade System** ✅ COMPLETED
-
-**Goal**: Add marketplace where players can sell fish and buy upgrades
-
-**Completed Tasks**:
-
-1. ✅ Created market scene with ocean/dock background
-2. ✅ Added 4 interactive shops (Bait, Line, Rod, Fish Buyer)
-3. ✅ Implemented money system (5% of fish score converts to cash)
-4. ✅ Fish automatically sold when entering market
-5. ✅ Created upgrade system with 3 upgrade types:
-   - Line Strength: +2s tackle timer per level (starts 7s, max 10 levels)
-   - Bait Quality: +5% rare fish chance per level (starts 1%, max 10 levels)
-   - Rod Power: +0.25x size multiplier per level (starts 0.5x, max 3.0x)
-6. ✅ Progressive cost scaling (base × 1.5^level)
-7. ✅ Shop UI with purchase confirmation and money tracking
-8. ✅ Navigation between market and dock scenes
-9. ✅ Added "Gar" hazard fish (fast, 0 points, future damage mechanic)
-
----
-
-### **PHASE 3: Tackle System (Initial Hook + Arrow Rhythm Game)** ⬅️ NEXT (POSTPONED)
-
-**Goal**: Add more fish variety, adjust scoring, and add trash items
-
-**Tasks**:
-
-1. [ ] Review and rebalance existing fish scores/stats
-2. [ ] Add 3-5 new fish types to FishTypes object
-3. [ ] Add "trash" category items (boot, tin can, seaweed, etc.)
-4. [ ] Trash items give 0 points (or negative points?)
-5. [ ] Update fish spawn logic to include trash items
-6. [ ] Adjust trash spawn rate (maybe 10-15% chance)
-7. [ ] Visual distinction for trash (different colors/shapes)
-8. [ ] Update UI to show "Trash caught!" message
-
-**New Fish Ideas**:
-
-- Legendary/rare fish (very fast, high points)
-- More common fish varieties
-- Seasonal fish (for future day/season system)
-
-**Trash Items**:
-
-- Boot: 0 points, slow moving
-- Tin Can: 0 points, medium speed
-- Seaweed: 0 points, floats around
-- Plastic Bag: 0 points, very slow
-
-**Config to add**:
-
-```javascript
-// Add to FishTypes in gameObjects.js
-TrashItems: {
-  Boot: {
-    color: 0x654321,
-    speed: 50,
-    points: 0,
-    size: 1.0,
-    isTrash: true
-  },
-  TinCan: {
-    color: 0xc0c0c0,
-    speed: 70,
-    points: 0,
-    size: 0.7,
-    isTrash: true
-  },
-  // etc...
-}
-
-SPAWN_CONFIG = {
-  TRASH_SPAWN_CHANCE: 0.15 // 15% chance
-}
-```
-
----
-
-### **PHASE 2: Daily Cycle System**
-
-**Goal**: Add day/night progression based on number of casts
-
-**Tasks**:
-
-1. [ ] Add cast counter to boatScene
-2. [ ] Implement day progression (every 10 casts = 1 day)
-3. [ ] Add day number display to UI
-4. [ ] Create time-of-day system:
-   - Morning (casts 0-2): Light blue sky
-   - Afternoon (casts 3-5): Bright sky
-   - Evening (casts 6-8): Orange/pink sky
-   - Night (casts 9-10): Dark blue/purple sky
-5. [ ] Change sky color based on time of day
-6. [ ] (Optional) Adjust fish spawn rates by time
-7. [ ] (Optional) Different fish appear at different times
-
-**Config to add**:
-
-```javascript
-DAY_CYCLE_CONFIG = {
-	CASTS_PER_DAY: 10,
-	TIMES_OF_DAY: ["morning", "afternoon", "evening", "night"],
-	SKY_COLORS: {
-		morning: 0x87ceeb,
-		afternoon: 0x87cefd,
-		evening: 0xff8c69,
-		night: 0x1a1a3e,
-	},
-};
-```
-
----
-
-### **PHASE 3: Tackle System (Initial Hook + Arrow Rhythm Game)**
-
-**Goal**: Add skill-based fish-catching mechanic after bobber hits a fish
 
 **Part 1: Initial Hook (Timing Bar)**
 
@@ -415,7 +392,9 @@ Fish Health: ████░░░░░░ (4/10)    Time: 7s
 - **Ocean**: Large saltwater fish (Tuna, Marlin, Swordfish)
 - **Swamp**: Rare/legendary fish (Gar, Alligator Gar, Snakehead)
 - **Deep Sea**: Exotic deep water fish (Anglerfish, Viperfish)
-- **Pond**: Small peaceful fish (Goldfish, Koi, Minnows)
+- **Pond**: Small peaceful fiLocations\*\* ⬅️ NEXT
+
+**Goal**: Add different fishing locations and boat progression, Minnows)
 
 **Upgrade Shop Items**:
 
@@ -575,7 +554,23 @@ MAPS = {
 **Files to modify**:
 
 - `src/gameObjects.js` (add fish types, trash items)
-- `src/scenes/boatScene.js` (update spawn logic, add trash spawn chance)
+
+### Fishing Screen
+
+- **Left Click**: Cast bobber / Hook timing attempt
+
+### Rhythm Minigame
+
+- **Arrow Keys** (←, ↑, ↓, →): Hit falling arrows
+- **WASD** (A, W, S, D): Alternative controls
+  - A = Left
+  - W = Up
+  - S = Down
+  - D = Right
+
+### UI Navigation
+
+- **Left Click**: Navigate menus, purchase upgradespawn logic, add trash spawn chance)
 
 ---
 
@@ -643,3 +638,23 @@ Open http://localhost:5173
 - All classes use config constants at top of file
 - Asset placeholders ready for when you add images
 - Easy to add new fish types in `FishTypes` object
+  ✅ Implemented two-stage catching system (hook timing + rhythm game)
+- ✅ Created rhythm minigame scene with DDR-style gameplay
+- ✅ Added WASD controls alongside arrow keys
+- ✅ Updated day cycle to 15 casts per day
+- ✅ Auto-transition to market after completing day
+- ✅ Marker speed now scales with fish speed
+- ✅ Right-half screen layout for minigame
+
+### Known Issues
+
+- None currently
+
+### Upcoming Features
+
+- Different fishing locations (Lake, River, Ocean, Swamp)
+- Boat upgrades to unlock new areas
+- Weather system affecting fish behavior
+- Sound effects and background music
+- Particle effects (water splashes, sparkles)
+- Enhanced animations
