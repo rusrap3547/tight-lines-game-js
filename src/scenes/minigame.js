@@ -5,7 +5,7 @@ RHYTHM MINIGAME - DDR/Guitar Hero style
 - Arrows fall from top to bottom
 - Player must press arrow keys when falling arrows reach the hit zones (hollow arrows)
 - Number of arrows based on fish health
-- Timer starts at 7 seconds, -0.5s penalty for each miss
+- Timer starts at 7 seconds
 - Success = catch fish, Failure = fish escapes
 */
 
@@ -15,13 +15,14 @@ RHYTHM MINIGAME - DDR/Guitar Hero style
 const MINIGAME_CONFIG = {
 	// Timing
 	INITIAL_TIME: 7,
-	MISS_PENALTY: 0.5,
 
 	// Arrow mechanics
-	ARROW_SPEED: 100, // pixels per second (slower for larger screen)
-	HIT_ZONE_Y: 140, // Y position of hit zones (hollow arrows)
+	ARROW_SPEED: 150, // pixels per second (slower for larger screen)
+	HIT_ZONE_Y: 140, // Y position of hit zones (will be calculated at bottom)
 	SPAWN_Y: -50, // Y position where arrows spawn (off-screen top)
-	HIT_THRESHOLD: 25, // pixels from hit zone center to count as hit (more forgiving)
+	HIT_THRESHOLD_ABOVE: 40, // pixels above hit zone center
+	HIT_THRESHOLD_BELOW: 20, // pixels below hit zone center
+	ARROW_SPAWN_INTERVAL: 800, // milliseconds between spawning new arrows
 
 	// Arrow lanes (X positions for left, up, down, right) - positioned for right half
 	// Will be calculated based on screen width in create()
@@ -33,6 +34,10 @@ const MINIGAME_CONFIG = {
 	TIMER_COLOR: "#ffff00",
 	SUCCESS_COLOR: "#00ff00",
 	FAIL_COLOR: "#ff0000",
+
+	// Success bar (horizontal at bottom)
+	SUCCESS_BAR_HEIGHT: 30,
+	SUCCESS_BAR_PADDING: 15, // padding from edges and bottom
 };
 
 export default class Minigame extends Phaser.Scene {
@@ -137,12 +142,88 @@ export default class Minigame extends Phaser.Scene {
 			}
 		);
 
-		// Create hit zones (hollow arrows at bottom)
+		// Create horizontal success bar at the bottom of right half
+		const successBarWidth =
+			minigameWidth - MINIGAME_CONFIG.SUCCESS_BAR_PADDING * 2;
+		const successBarY =
+			height -
+			MINIGAME_CONFIG.SUCCESS_BAR_PADDING -
+			MINIGAME_CONFIG.SUCCESS_BAR_HEIGHT / 2;
+		const successBarX = minigameCenter;
+
+		// White box background
+		this.successBoxBg = this.add
+			.rectangle(
+				successBarX,
+				successBarY,
+				successBarWidth + 10,
+				MINIGAME_CONFIG.SUCCESS_BAR_HEIGHT + 10,
+				0xffffff
+			)
+			.setOrigin(0.5);
+
+		// Dark background bar inside white box
+		this.successBarBg = this.add
+			.rectangle(
+				successBarX,
+				successBarY,
+				successBarWidth,
+				MINIGAME_CONFIG.SUCCESS_BAR_HEIGHT,
+				0x333333
+			)
+			.setOrigin(0.5);
+
+		// Progress bar (green) - starts at 0 width, grows from left to right
+		this.successBar = this.add
+			.rectangle(
+				successBarX - successBarWidth / 2,
+				successBarY,
+				0,
+				MINIGAME_CONFIG.SUCCESS_BAR_HEIGHT,
+				0x00ff00
+			)
+			.setOrigin(0, 0.5);
+
+		// Store success bar dimensions for updates
+		this.successBarMaxWidth = successBarWidth;
+		this.successBarY = successBarY;
+
+		// Calculate hit zone Y position (just above the success bar)
+		// Position it so the bottom of the hit zone sits just above the success bar white box
+		const successBarTopEdge =
+			successBarY - (MINIGAME_CONFIG.SUCCESS_BAR_HEIGHT + 10) / 2;
+		const hitZoneHeight =
+			MINIGAME_CONFIG.HIT_THRESHOLD_ABOVE + MINIGAME_CONFIG.HIT_THRESHOLD_BELOW;
+		const hitZoneY = successBarTopEdge - hitZoneHeight / 2 - 5; // 5px gap from success bar
+
+		// Create hit zone highlight background
+		const hitZoneWidth = MINIGAME_CONFIG.LANE_SPACING * 3 + 50; // Width to cover all lanes
+
+		// Semi-transparent colored background for hit zone (yellowish for better contrast)
+		this.hitZoneHighlight = this.add
+			.rectangle(
+				minigameCenter,
+				hitZoneY,
+				hitZoneWidth,
+				hitZoneHeight,
+				0xffff00,
+				0.15
+			)
+			.setOrigin(0.5);
+
+		// Border around hit zone (yellow/gold for better contrast)
+		this.hitZoneBorder = this.add
+			.rectangle(minigameCenter, hitZoneY, hitZoneWidth, hitZoneHeight)
+			.setOrigin(0.5)
+			.setStrokeStyle(3, 0xffff00, 0.8);
+		this.hitZoneBorder.setFillStyle();
+
+		// Create hit zones (hollow arrows at bottom near success bar)
 		this.hitZones = [];
 		const arrowTypes = MINIGAME_CONFIG.ARROW_TYPES;
 		for (let i = 0; i < 4; i++) {
 			const x = this.lanePositions[i];
-			const y = MINIGAME_CONFIG.HIT_ZONE_Y;
+			const y = hitZoneY;
 			const hollowArrow = this.add.sprite(
 				x,
 				y,
@@ -153,9 +234,13 @@ export default class Minigame extends Phaser.Scene {
 			this.hitZones.push({ x, y, type: arrowTypes[i], sprite: hollowArrow });
 		}
 
-		// Generate falling arrows based on fish health
+		// Store hit zone Y for arrow checking
+		this.hitZoneY = hitZoneY;
+
+		// Initialize arrow spawning
 		this.fallingArrows = [];
-		this.generateArrowSequence();
+		this.lastArrowSpawnTime = 0;
+		this.spawnArrow(); // Spawn first arrow immediately
 
 		// Setup keyboard input - arrow keys and WASD
 		this.cursors = this.input.keyboard.createCursorKeys();
@@ -189,31 +274,25 @@ export default class Minigame extends Phaser.Scene {
 			.setOrigin(0.5);
 	}
 
-	generateArrowSequence() {
+	spawnArrow() {
+		// Spawn a single random arrow
 		const arrowTypes = MINIGAME_CONFIG.ARROW_TYPES;
-		const spacing = 100; // pixels between arrows (more space for slower speed)
+		const randomType = Phaser.Math.RND.pick(arrowTypes);
+		const laneIndex = arrowTypes.indexOf(randomType);
+		const x = this.lanePositions[laneIndex];
+		const y = MINIGAME_CONFIG.SPAWN_Y;
 
-		for (let i = 0; i < this.arrowsToHit; i++) {
-			// Random arrow type
-			const randomType = Phaser.Math.RND.pick(arrowTypes);
-			const laneIndex = arrowTypes.indexOf(randomType);
-			const x = this.lanePositions[laneIndex];
+		// Create arrow sprite
+		const arrow = this.add.sprite(x, y, `${randomType}Arrow`);
 
-			// Spawn with spacing
-			const y = MINIGAME_CONFIG.SPAWN_Y - i * spacing;
-
-			// Create arrow sprite
-			const arrow = this.add.sprite(x, y, `${randomType}Arrow`);
-
-			this.fallingArrows.push({
-				sprite: arrow,
-				type: randomType,
-				x: x,
-				y: y,
-				hit: false,
-				missed: false,
-			});
-		}
+		this.fallingArrows.push({
+			sprite: arrow,
+			type: randomType,
+			x: x,
+			y: y,
+			hit: false,
+			missed: false,
+		});
 	}
 
 	update(time, delta) {
@@ -231,8 +310,17 @@ export default class Minigame extends Phaser.Scene {
 			return;
 		}
 
+		// Spawn new arrows continuously
+		this.lastArrowSpawnTime += delta;
+		if (this.lastArrowSpawnTime >= MINIGAME_CONFIG.ARROW_SPAWN_INTERVAL) {
+			this.spawnArrow();
+			this.lastArrowSpawnTime = 0;
+		}
+
 		// Update falling arrows
-		for (let arrow of this.fallingArrows) {
+		for (let i = this.fallingArrows.length - 1; i >= 0; i--) {
+			const arrow = this.fallingArrows[i];
+
 			if (!arrow.hit && !arrow.missed) {
 				// Move arrow down
 				arrow.y += MINIGAME_CONFIG.ARROW_SPEED * (delta / 1000);
@@ -241,9 +329,14 @@ export default class Minigame extends Phaser.Scene {
 				// Check if arrow passed the hit zone (missed)
 				if (
 					arrow.y >
-					MINIGAME_CONFIG.HIT_ZONE_Y + MINIGAME_CONFIG.HIT_THRESHOLD + 30
+					this.hitZoneY + MINIGAME_CONFIG.HIT_THRESHOLD_BELOW + 30
 				) {
 					this.missArrow(arrow);
+				}
+			} else {
+				// Remove arrows that are hit or missed and have been destroyed
+				if (!arrow.sprite || !arrow.sprite.active) {
+					this.fallingArrows.splice(i, 1);
 				}
 			}
 		}
@@ -290,14 +383,21 @@ export default class Minigame extends Phaser.Scene {
 	tryHitArrow(keyType) {
 		// Find the closest arrow of matching type in the hit zone
 		let closestArrow = null;
-		let closestDistance = MINIGAME_CONFIG.HIT_THRESHOLD;
+		let closestDistance = Infinity;
 
 		for (let arrow of this.fallingArrows) {
 			if (arrow.type === keyType && !arrow.hit && !arrow.missed) {
-				const distance = Math.abs(arrow.y - MINIGAME_CONFIG.HIT_ZONE_Y);
-				if (distance < closestDistance) {
-					closestDistance = distance;
-					closestArrow = arrow;
+				const distance = arrow.y - this.hitZoneY;
+				// Check if arrow is within the asymmetric hit zone (30px above, 10px below)
+				if (
+					distance >= -MINIGAME_CONFIG.HIT_THRESHOLD_ABOVE &&
+					distance <= MINIGAME_CONFIG.HIT_THRESHOLD_BELOW
+				) {
+					const absDistance = Math.abs(distance);
+					if (absDistance < closestDistance) {
+						closestDistance = absDistance;
+						closestArrow = arrow;
+					}
 				}
 			}
 		}
@@ -318,6 +418,16 @@ export default class Minigame extends Phaser.Scene {
 		// Update counter
 		this.counterText.setText(`Arrows: ${this.arrowsHit}/${this.arrowsToHit}`);
 
+		// Update success bar (horizontal - grow width left to right)
+		const progress = this.arrowsHit / this.arrowsToHit;
+		const newWidth = this.successBarMaxWidth * progress;
+		this.tweens.add({
+			targets: this.successBar,
+			width: newWidth,
+			duration: 200,
+			ease: "Power2",
+		});
+
 		// Visual feedback
 		arrow.sprite.setTint(0x00ff00);
 		this.tweens.add({
@@ -336,9 +446,6 @@ export default class Minigame extends Phaser.Scene {
 	missArrow(arrow) {
 		arrow.missed = true;
 
-		// Apply time penalty
-		this.timeRemaining -= MINIGAME_CONFIG.MISS_PENALTY;
-
 		// Visual feedback
 		arrow.sprite.setTint(0xff0000);
 		this.tweens.add({
@@ -350,10 +457,7 @@ export default class Minigame extends Phaser.Scene {
 			},
 		});
 
-		this.showFeedback(
-			`MISSED! -${MINIGAME_CONFIG.MISS_PENALTY}s`,
-			MINIGAME_CONFIG.FAIL_COLOR
-		);
+		this.showFeedback("MISSED!", MINIGAME_CONFIG.FAIL_COLOR);
 	}
 
 	showFeedback(text, color) {

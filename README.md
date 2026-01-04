@@ -24,7 +24,29 @@ A Phaser 3 fishing game featuring a two-stage skill-based catching system: hook 
 ### Stage 2: Rhythm Minigame (DDR Style)
 
 - Right half of screen shows 4 lanes with falling arrows
-- Arrows fall Features
+- **Yellow hit zone** at the bottom shows where to time your hits
+- Press **Arrow Keys** (←, ↑, ↓, →) or **WASD** when arrows enter the yellow zone
+- Match the arrow direction with your key press
+- **Hit Zone**: 40 pixels above and 20 pixels below center for forgiving timing
+- Arrows spawn continuously every 0.8 seconds
+- **White progress bar** at the bottom fills as you hit arrows
+- **Timer**: 7 seconds to complete (no penalties for misses)
+- **Required Hits**: Based on fish health (3-5 arrows typically)
+- ✅ **Success**: Catch the fish and earn points
+- ❌ **Failure**: Time runs out, fish escapes
+
+### Controls
+
+- **Mouse Click**: Cast bobber, hook fish, advance menus
+- **Arrow Keys or WASD**: Rhythm minigame controls
+- **Left/A**: Hit left arrows
+- **Up/W**: Hit up arrows
+- **Down/S**: Hit down arrows
+- **Right/D**: Hit right arrows
+
+---
+
+## ✨ Features
 
 ### Core Fishing Mechanics
 
@@ -45,14 +67,17 @@ A Phaser 3 fishing game featuring a two-stage skill-based catching system: hook 
   - Failure causes fish to escape
   - Marker speed scales with fish speed (faster fish = harder timing)
 - ✅ **Rhythm Minigame (DDR Style)**:
-  - Right half screen layout
-  - 4 lanes with falling arrows
+  - Right half screen layout with 4 lanes
+  - Arrows continuously spawn and fall to bottom
+  - Yellow highlighted hit zone at bottom for easy visibility
   - Arrow Keys (←, ↑, ↓, →) or WASD controls
-  - Number of arrows based on fish health
-  - 7-second timer with -0.5s penalties
+  - Forgiving 60px hit zone (40px above, 20px below center)
+  - Required arrows based on fish health (3-5 typically)
+  - 7-second timer (no miss penalties)
+  - White horizontal progress bar shows completion
   - Visual feedback for hits/misses
-  - Success counter shows progress
-  - Win = catch fish, Lose = fish escapesoints
+  - Dead arrows cleaned from memory automatically
+  - Win = catch fish, Lose = time runs out
 - Trash items: 0 points
 
 ### Day/Night Cycle
