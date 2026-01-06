@@ -7,8 +7,8 @@ import Minigame from "./scenes/minigame.js";
 const config = {
 	type: Phaser.AUTO,
 	parent: "game_container",
-	width: 300,
-	height: 180,
+	width: 384,
+	height: 216,
 	pixelArt: true,
 	roundPixels: true,
 	physics: {

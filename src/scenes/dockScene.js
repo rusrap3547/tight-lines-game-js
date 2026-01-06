@@ -11,8 +11,8 @@ const GAME_CONFIG = {
 	SAND_HEIGHT_PERCENT: 0.05,
 
 	// Dock settings
-	DOCK_WIDTH: 150,
-	DOCK_HEIGHT: 30,
+	DOCK_WIDTH: 192,
+	DOCK_HEIGHT: 38,
 
 	// Fish spawning
 	MIN_FISH_COUNT: 3,
@@ -100,6 +100,25 @@ export default class dockScene extends Phaser.Scene {
 	}
 
 	preload() {
+		// Load layered dock backgrounds (384x216)
+		this.load.image("layer_sky", "assets/images/Dock/0sky.png");
+		this.load.image("layer_clouds", "assets/images/Dock/1clouds.png");
+		this.load.image("layer_shadowTrees", "assets/images/Dock/2shadowTrees.png");
+		this.load.image(
+			"layer_backgroundTrees",
+			"assets/images/Dock/3backgroundTrees.png"
+		);
+		this.load.image("layer_middleTrees", "assets/images/Dock/4middleTrees.png");
+		this.load.image("layer_frontTrees", "assets/images/Dock/5frontTrees.png");
+		this.load.image(
+			"layer_horizonAndSea",
+			"assets/images/Dock/6horizonAndSea.png"
+		);
+		this.load.image("layer_oceanFloor", "assets/images/Dock/7oceanFloor.png");
+		this.load.image("layer_pondWater", "assets/images/Dock/8pondWater.png");
+		this.load.image("dockMap", "assets/images/Dock/dockMap.png");
+		this.load.image("boat", "assets/images/Dock/Boat.png");
+
 		// Load fisherman spritesheets (48x48 per frame)
 		this.load.spritesheet(
 			"fisherman_idle",
@@ -143,6 +162,7 @@ export default class dockScene extends Phaser.Scene {
 		this.load.image("bass", "assets/sprites/Fresh Water/Bass.png");
 		this.load.image("catfish", "assets/sprites/Fresh Water/Catfish.png");
 		this.load.image("arowana", "assets/sprites/Fresh Water/Arowana.png");
+		this.load.image("gar", "assets/sprites/Fresh Water/gar.png");
 
 		// Load saltwater fish sprites
 		this.load.image("anchovy", "assets/sprites/Salt Water/Anchovy.png");
@@ -241,67 +261,75 @@ export default class dockScene extends Phaser.Scene {
 		});
 
 		// ============================================
-		// SCENE SETUP
+		// SCENE SETUP - LAYERED BACKGROUNDS
 		// ============================================
 
-		// Sky at top (will change color based on time of day)
-		this.skyRectangle = this.add
-			.rectangle(
-				0,
-				0,
-				width,
-				height * GAME_CONFIG.SKY_HEIGHT_PERCENT,
-				DAY_CYCLE_CONFIG.SKY_COLORS.morning
-			)
-			.setOrigin(0, 0);
-
-		// Water
+		// Render background layers in order (back to front)
+		// Layer 0: Sky
 		this.add
-			.rectangle(
-				0,
-				height * GAME_CONFIG.SKY_HEIGHT_PERCENT,
-				width,
-				height * GAME_CONFIG.WATER_HEIGHT_PERCENT,
-				GAME_CONFIG.WATER_COLOR
-			)
-			.setOrigin(0, 0);
+			.image(0, 0, "layer_sky")
+			.setOrigin(0, 0)
+			.setDisplaySize(width, height);
 
-		// Sand at bottom
+		// Layer 1: Clouds
 		this.add
-			.rectangle(
-				0,
-				height * (1 - GAME_CONFIG.SAND_HEIGHT_PERCENT),
-				width,
-				height * GAME_CONFIG.SAND_HEIGHT_PERCENT,
-				GAME_CONFIG.SAND_COLOR
-			)
-			.setOrigin(0, 0);
+			.image(0, 0, "layer_clouds")
+			.setOrigin(0, 0)
+			.setDisplaySize(width, height);
 
-		// Dock on right side, along top edge of water
+		// Layer 2: Shadow Trees
+		this.add
+			.image(0, 0, "layer_shadowTrees")
+			.setOrigin(0, 0)
+			.setDisplaySize(width, height);
+
+		// Layer 3: Background Trees
+		this.add
+			.image(0, 0, "layer_backgroundTrees")
+			.setOrigin(0, 0)
+			.setDisplaySize(width, height);
+
+		// Layer 4: Middle Trees
+		this.add
+			.image(0, 0, "layer_middleTrees")
+			.setOrigin(0, 0)
+			.setDisplaySize(width, height);
+
+		// Layer 5: Front Trees
+		this.add
+			.image(0, 0, "layer_frontTrees")
+			.setOrigin(0, 0)
+			.setDisplaySize(width, height);
+
+		// Layer 6: Horizon and Sea
+		this.add
+			.image(0, 0, "layer_horizonAndSea")
+			.setOrigin(0, 0)
+			.setDisplaySize(width, height);
+
+		// Layer 7: Ocean Floor
+		this.add
+			.image(0, 0, "layer_oceanFloor")
+			.setOrigin(0, 0)
+			.setDisplaySize(width, height);
+
+		// *** FISH WILL BE RENDERED HERE (between oceanFloor and pondWater) ***
+
+		// Dock structure (positioned on right side)
+		// Get actual dock image height to calculate bottom position
+		const dockTexture = this.textures.get("dockMap");
+		const dockImageHeight = dockTexture.getSourceImage().height;
+		const dockBottomY = height * 0.3 + dockImageHeight - height * 0.05 + 10;
+		// Move dock so top is where bottom currently is
+		const dockMapImage = this.add
+			.image(width, dockBottomY, "dockMap")
+			.setOrigin(1, 0);
+
+		// Store reference for positioning calculations
 		const dockWidth = GAME_CONFIG.DOCK_WIDTH;
 		const dockHeight = GAME_CONFIG.DOCK_HEIGHT;
 		const dockX = width - dockWidth;
 		const dockY = height * GAME_CONFIG.SKY_HEIGHT_PERCENT;
-
-		// Dock base
-		this.add
-			.rectangle(dockX, dockY, dockWidth, dockHeight, GAME_CONFIG.DOCK_COLOR)
-			.setOrigin(0, 0);
-
-		// Dock posts
-		const postWidth = 20;
-		const postSpacing = 50;
-		for (let i = 0; i < 3; i++) {
-			this.add
-				.rectangle(
-					dockX + postSpacing * i + 25,
-					dockY,
-					postWidth,
-					dockHeight,
-					GAME_CONFIG.DOCK_POST_COLOR
-				)
-				.setOrigin(0, 0);
-		}
 
 		// ============================================
 		// GAME OBJECTS
@@ -309,12 +337,12 @@ export default class dockScene extends Phaser.Scene {
 
 		// Create player at the end of dock (left side, on top)
 		const playerX = dockX + 10;
-		const playerY = dockY;
+		const playerY = dockY + height * 0.1; // Moved down by 10%
 		this.player = new Player(this, playerX, playerY, ASSETS.player);
 
 		// Create bobber at top of water, to the left of player
 		const bobberX = playerX - 30;
-		const bobberY = dockY + dockHeight;
+		const bobberY = dockY + dockHeight + height * 0.1; // Moved down by 10%
 		const sandY = height * (1 - GAME_CONFIG.SAND_HEIGHT_PERCENT);
 		this.bobber = new Bobber(this, bobberX, bobberY, sandY, ASSETS.bobber);
 
@@ -330,6 +358,9 @@ export default class dockScene extends Phaser.Scene {
 				});
 			}
 		});
+
+		// NOTE: Fish array will be initialized below, then rendered at this depth level
+		// This ensures fish swim "under" the pond water overlay
 
 		// ============================================
 		// INPUT SETUP
@@ -357,7 +388,8 @@ export default class dockScene extends Phaser.Scene {
 		// Store water boundaries
 		this.waterLeft = 0;
 		this.waterRight = width;
-		this.waterTop = height * GAME_CONFIG.SKY_HEIGHT_PERCENT + dockHeight;
+		this.waterTop =
+			height * GAME_CONFIG.SKY_HEIGHT_PERCENT + dockHeight + height * 0.1; // Moved down 10%
 		this.waterBottom = height * (1 - GAME_CONFIG.SAND_HEIGHT_PERCENT);
 
 		// Fish management
@@ -365,6 +397,22 @@ export default class dockScene extends Phaser.Scene {
 		this.spawnFish();
 		this.nextSpawnTime = 0;
 		this.nextDespawnTime = 0;
+
+		// Boat positioned at end of dock on top of water
+
+		const boatOffsetY = height * 0.35 + dockImageHeight - height * 0.05; // Same offset as dock, moved up 5%
+		const boatImage = this.add
+			.image(width - 80, boatOffsetY, "boat")
+			.setOrigin(0.5, 0.5);
+
+		// ============================================
+		// TOP WATER LAYER (Layer 8: Pond Water)
+		// This renders ABOVE the fish to create underwater effect
+		// ============================================
+		this.add
+			.image(0, 0, "layer_pondWater")
+			.setOrigin(0, 0)
+			.setDisplaySize(width, height);
 
 		// Score tracking - get from registry or start at 0
 		if (!this.registry.has("currentScore")) {
@@ -403,7 +451,7 @@ export default class dockScene extends Phaser.Scene {
 			.setOrigin(0, 0);
 
 		this.castText = this.add
-			.text(10, 50, "Casts: 0/10", {
+			.text(10, 50, `Casts: 0/${DAY_CYCLE_CONFIG.CASTS_PER_DAY}`, {
 				fontSize: "12px",
 				fill: "#fff",
 				fontFamily: "Arial",

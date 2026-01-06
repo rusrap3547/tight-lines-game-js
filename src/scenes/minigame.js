@@ -17,16 +17,16 @@ const MINIGAME_CONFIG = {
 	INITIAL_TIME: 7,
 
 	// Arrow mechanics
-	ARROW_SPEED: 150, // pixels per second (slower for larger screen)
-	HIT_ZONE_Y: 140, // Y position of hit zones (will be calculated at bottom)
-	SPAWN_Y: -50, // Y position where arrows spawn (off-screen top)
-	HIT_THRESHOLD_ABOVE: 40, // pixels above hit zone center
-	HIT_THRESHOLD_BELOW: 20, // pixels below hit zone center
+	ARROW_SPEED: 192, // pixels per second (slower for larger screen)
+	HIT_ZONE_Y: 179, // Y position of hit zones (will be calculated at bottom)
+	SPAWN_Y: -64, // Y position where arrows spawn (off-screen top)
+	HIT_THRESHOLD_ABOVE: 51, // pixels above hit zone center
+	HIT_THRESHOLD_BELOW: 26, // pixels below hit zone center
 	ARROW_SPAWN_INTERVAL: 800, // milliseconds between spawning new arrows
 
 	// Arrow lanes (X positions for left, up, down, right) - positioned for right half
 	// Will be calculated based on screen width in create()
-	LANE_SPACING: 40,
+	LANE_SPACING: 51,
 	ARROW_TYPES: ["left", "up", "down", "right"],
 
 	// Visual
@@ -36,8 +36,8 @@ const MINIGAME_CONFIG = {
 	FAIL_COLOR: "#ff0000",
 
 	// Success bar (horizontal at bottom)
-	SUCCESS_BAR_HEIGHT: 30,
-	SUCCESS_BAR_PADDING: 15, // padding from edges and bottom
+	SUCCESS_BAR_HEIGHT: 38,
+	SUCCESS_BAR_PADDING: 19, // padding from edges and bottom
 };
 
 export default class Minigame extends Phaser.Scene {
@@ -97,8 +97,8 @@ export default class Minigame extends Phaser.Scene {
 
 		// Title
 		this.add
-			.text(minigameCenter, 15, "REEL IT IN!", {
-				fontSize: "16px",
+			.text(minigameCenter, 19, "REEL IT IN!", {
+				fontSize: "20px",
 				fill: "#ffffff",
 				fontFamily: "Arial",
 				fontStyle: "bold",
@@ -116,11 +116,11 @@ export default class Minigame extends Phaser.Scene {
 		// Timer display
 		this.timeRemaining = MINIGAME_CONFIG.INITIAL_TIME;
 		this.timerText = this.add.text(
-			rightHalfStart + 10,
-			10,
+			rightHalfStart + 13,
+			13,
 			`Time: ${this.timeRemaining.toFixed(1)}s`,
 			{
-				fontSize: "12px",
+				fontSize: "15px",
 				fill: MINIGAME_CONFIG.TIMER_COLOR,
 				fontFamily: "Arial",
 				fontStyle: "bold",
@@ -131,11 +131,11 @@ export default class Minigame extends Phaser.Scene {
 		this.arrowsHit = 0;
 		this.arrowsToHit = this.fishData.health || 3;
 		this.counterText = this.add.text(
-			rightHalfStart + 10,
-			30,
+			rightHalfStart + 13,
+			38,
 			`Arrows: ${this.arrowsHit}/${this.arrowsToHit}`,
 			{
-				fontSize: "12px",
+				fontSize: "15px",
 				fill: "#ffffff",
 				fontFamily: "Arial",
 				fontStyle: "bold",
@@ -434,7 +434,7 @@ export default class Minigame extends Phaser.Scene {
 			targets: arrow.sprite,
 			alpha: 0,
 			scale: 1.5,
-			duration: 200,
+			duration: 150, // Reduced from 200 for faster feedback
 			onComplete: () => {
 				arrow.sprite.destroy();
 			},
@@ -446,12 +446,12 @@ export default class Minigame extends Phaser.Scene {
 	missArrow(arrow) {
 		arrow.missed = true;
 
-		// Visual feedback
+		// Visual feedback (faster fadeout)
 		arrow.sprite.setTint(0xff0000);
 		this.tweens.add({
 			targets: arrow.sprite,
 			alpha: 0,
-			duration: 300,
+			duration: 200, // Reduced from 300
 			onComplete: () => {
 				arrow.sprite.destroy();
 			},
@@ -461,17 +461,19 @@ export default class Minigame extends Phaser.Scene {
 	}
 
 	showFeedback(text, color) {
+		// Cancel any existing feedback tween to allow immediate new feedback
+		this.tweens.killTweensOf(this.feedbackText);
+
 		this.feedbackText.setText(text);
 		this.feedbackText.setColor(color);
+		this.feedbackText.setAlpha(1); // Reset alpha immediately
 
-		// Fade out after brief display
+		// Fade out after brief display (shorter duration for faster feedback)
 		this.tweens.add({
 			targets: this.feedbackText,
 			alpha: 0,
-			duration: 500,
-			onComplete: () => {
-				this.feedbackText.setAlpha(1);
-			},
+			duration: 300, // Reduced from 500
+			delay: 100, // Small delay so it's visible
 		});
 	}
 

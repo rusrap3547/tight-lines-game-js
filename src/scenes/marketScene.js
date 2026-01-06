@@ -10,10 +10,10 @@ const MARKET_CONFIG = {
 	DOCK_COLOR: 0x8b4513,
 
 	// Shop layout
-	SHOP_WIDTH: 60,
-	SHOP_HEIGHT: 50,
-	SHOP_SPACING: 15,
-	SHOP_Y: 80,
+	SHOP_WIDTH: 77,
+	SHOP_HEIGHT: 64,
+	SHOP_SPACING: 19,
+	SHOP_Y: 102,
 
 	// Colors for shops
 	BAIT_SHOP_COLOR: 0xffb6c1,
@@ -22,9 +22,9 @@ const MARKET_CONFIG = {
 	BUYER_SHOP_COLOR: 0x87ceeb,
 
 	// Arrow navigation
-	ARROW_SIZE: 20,
+	ARROW_SIZE: 26,
 	ARROW_COLOR: 0x00ff00,
-	ARROW_X: 20,
+	ARROW_X: 26,
 };
 
 // ============================================
@@ -116,8 +116,8 @@ export default class marketScene extends Phaser.Scene {
 		// TITLE
 		// ============================================
 		this.add
-			.text(width / 2, 15, "MARKET", {
-				fontSize: "20px",
+			.text(width / 2, 19, "MARKET", {
+				fontSize: "26px",
 				fill: "#fff",
 				fontFamily: "Arial",
 				stroke: "#000",
@@ -130,8 +130,8 @@ export default class marketScene extends Phaser.Scene {
 		// MONEY DISPLAY
 		// ============================================
 		this.moneyText = this.add
-			.text(width / 2, 35, `Gold: ${this.registry.get("playerMoney")}`, {
-				fontSize: "14px",
+			.text(width / 2, 45, `Gold: ${this.registry.get("playerMoney")}`, {
+				fontSize: "18px",
 				fill: "#ffd700",
 				fontFamily: "Arial",
 				stroke: "#000",

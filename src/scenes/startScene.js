@@ -16,16 +16,16 @@ export default class startScene extends Phaser.Scene {
 
 		// Add welcome text
 		this.add
-			.text(150, 70, "Tight Lines Game", {
-				fontSize: "16px",
+			.text(192, 90, "Tight Lines Game", {
+				fontSize: "20px",
 				fill: "#fff",
 				fontFamily: "Arial",
 			})
 			.setOrigin(0.5);
 
 		this.add
-			.text(150, 100, "Press SPACE to start", {
-				fontSize: "8px",
+			.text(192, 128, "Press SPACE to start", {
+				fontSize: "10px",
 				fill: "#fff",
 				fontFamily: "Arial",
 			})

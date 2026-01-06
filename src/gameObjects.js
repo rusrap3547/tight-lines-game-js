@@ -4,23 +4,23 @@ import Phaser from "phaser";
 // GAME OBJECT CONFIGURATION
 // ============================================
 const PLAYER_CONFIG = {
-	WIDTH: 20,
-	HEIGHT: 40,
+	WIDTH: 26,
+	HEIGHT: 51,
 	COLOR: 0xff6b6b,
 	// Add animation frames, sprite sheet details here later
 };
 
 const BOBBER_CONFIG = {
-	RADIUS: 8,
+	RADIUS: 10,
 	COLOR: 0xff0000,
-	CAST_SPEED: 200, // pixels per second
+	CAST_SPEED: 256, // pixels per second
 	LINE_COLOR: 0x333333,
-	LINE_WIDTH: 2,
+	LINE_WIDTH: 3,
 };
 
 const FISH_CONFIG = {
-	BASE_WIDTH: 30,
-	BASE_HEIGHT: 15,
+	BASE_WIDTH: 38,
+	BASE_HEIGHT: 19,
 };
 
 // ============================================
@@ -222,7 +222,12 @@ export class Fish {
 		// Flip sprite to face direction of movement
 		// direction = 1 (right) -> no flip (flipX = false)
 		// direction = -1 (left) -> flip (flipX = true)
-		this.sprite.flipX = this.direction < 0;
+		// Special case: Gar sprite faces left by default, so invert the flip logic
+		if (this.fishType === "gar") {
+			this.sprite.flipX = this.direction > 0; // Inverted for Gar
+		} else {
+			this.sprite.flipX = this.direction < 0;
+		}
 
 		// Update sprite position
 		this.sprite.x = this.x;
@@ -400,7 +405,7 @@ export const FishTypes = {
 	},
 	// Hazard/Evil Fish
 	Gar: {
-		assetKey: null,
+		assetKey: "gar",
 		color: 0xff0000,
 		speed: 170,
 		health: 3,
