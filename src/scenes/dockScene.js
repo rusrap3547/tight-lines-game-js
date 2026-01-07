@@ -319,7 +319,7 @@ export default class dockScene extends Phaser.Scene {
 		// Get actual dock image height to calculate bottom position
 		const dockTexture = this.textures.get("dockMap");
 		const dockImageHeight = dockTexture.getSourceImage().height;
-		const dockBottomY = height * 0.3 + dockImageHeight - height * 0.05 + 10;
+		const dockBottomY = height * 0.3 + dockImageHeight - height * 0.05;
 		// Move dock so top is where bottom currently is
 		const dockMapImage = this.add
 			.image(width, dockBottomY, "dockMap")
