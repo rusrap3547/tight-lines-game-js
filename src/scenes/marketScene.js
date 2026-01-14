@@ -71,6 +71,18 @@ export default class marketScene extends Phaser.Scene {
 		this.fishScore = data.score || 0;
 	}
 
+	preload() {
+		// Load market stalls sprite sheet (12 stalls, 4 rows x 3 columns, 128x128 each)
+		this.load.spritesheet("marketStalls", "assets/images/Market/sprite.png", {
+			frameWidth: 128,
+			frameHeight: 128,
+		});
+
+		// Load market background images
+		this.load.image("marketDock", "assets/images/Market/marketDock.png");
+		this.load.image("marketOcean", "assets/images/Market/marketOcean.png");
+	}
+
 	create() {
 		const { width, height } = this.cameras.main;
 
@@ -97,20 +109,16 @@ export default class marketScene extends Phaser.Scene {
 			.setOrigin(0, 0);
 
 		// Ocean
-		this.add
-			.rectangle(
-				0,
-				height * 0.3,
-				width,
-				height * 0.2,
-				MARKET_CONFIG.OCEAN_COLOR
-			)
-			.setOrigin(0, 0);
+		const ocean = this.add
+			.image(0, height * 0.3, "marketOcean")
+			.setOrigin(0, 0)
+			.setDisplaySize(width, height * 0.2);
 
 		// Dock/Boardwalk (bottom half)
-		this.add
-			.rectangle(0, height * 0.5, width, height * 0.5, MARKET_CONFIG.DOCK_COLOR)
-			.setOrigin(0, 0);
+		const dock = this.add
+			.image(0, height * 0.5, "marketDock")
+			.setOrigin(0, 0)
+			.setDisplaySize(width, height * 0.5);
 
 		// ============================================
 		// TITLE
@@ -142,11 +150,21 @@ export default class marketScene extends Phaser.Scene {
 		// ============================================
 		// CREATE SHOPS
 		// ============================================
-		const shopY = MARKET_CONFIG.SHOP_Y;
-		const shopWidth = MARKET_CONFIG.SHOP_WIDTH;
+		// Randomly select 4 different stall frames from 0-11
+		const availableFrames = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+		const selectedFrames = [];
+		for (let i = 0; i < 4; i++) {
+			const randomIndex = Phaser.Math.Between(0, availableFrames.length - 1);
+			selectedFrames.push(availableFrames[randomIndex]);
+			availableFrames.splice(randomIndex, 1);
+		}
+
+		// Position shops on the dock (bottom half)
+		const stallSize = 64; // Scale down from 128 to 64
 		const shopSpacing = MARKET_CONFIG.SHOP_SPACING;
-		const totalShopWidth = shopWidth * 4 + shopSpacing * 3;
+		const totalShopWidth = stallSize * 4 + shopSpacing * 3;
 		const startX = (width - totalShopWidth) / 2;
+		const shopY = height * 0.5 + 20; // Position on dock (starts at 50% + some padding)
 
 		// Bait Shop
 		this.createShop(
@@ -154,34 +172,38 @@ export default class marketScene extends Phaser.Scene {
 			shopY,
 			"BAIT\nSHOP",
 			MARKET_CONFIG.BAIT_SHOP_COLOR,
-			"bait"
+			"bait",
+			selectedFrames[0]
 		);
 
 		// Line Shop
 		this.createShop(
-			startX + shopWidth + shopSpacing,
+			startX + stallSize + shopSpacing,
 			shopY,
 			"LINE\nSHOP",
 			MARKET_CONFIG.LINE_SHOP_COLOR,
-			"line"
+			"line",
+			selectedFrames[1]
 		);
 
 		// Rod Shop
 		this.createShop(
-			startX + (shopWidth + shopSpacing) * 2,
+			startX + (stallSize + shopSpacing) * 2,
 			shopY,
 			"ROD\nSHOP",
 			MARKET_CONFIG.ROD_SHOP_COLOR,
-			"rod"
+			"rod",
+			selectedFrames[2]
 		);
 
 		// Fish Buyer
 		this.createShop(
-			startX + (shopWidth + shopSpacing) * 3,
+			startX + (stallSize + shopSpacing) * 3,
 			shopY,
 			"FISH\nBUYER",
 			MARKET_CONFIG.BUYER_SHOP_COLOR,
-			"buyer"
+			"buyer",
+			selectedFrames[3]
 		);
 
 		// ============================================
@@ -225,38 +247,47 @@ export default class marketScene extends Phaser.Scene {
 			.setOrigin(0, 0.5);
 	}
 
-	createShop(x, y, label, color, shopType) {
-		const shopWidth = MARKET_CONFIG.SHOP_WIDTH;
-		const shopHeight = MARKET_CONFIG.SHOP_HEIGHT;
+	createShop(x, y, label, color, shopType, frameIndex) {
+		const stallSize = 64;
 
-		// Shop building
-		const shop = this.add
-			.rectangle(x, y, shopWidth, shopHeight, color)
-			.setOrigin(0, 0)
-			.setInteractive({ useHandCursor: true });
+		// Create a sprite and set the specific frame
+		const shop = this.add.sprite(
+			x + stallSize / 2,
+			y + stallSize / 2,
+			"marketStalls"
+		);
+
+		// Set the frame name - spritesheet frames are indexed starting from __BASE for frame 0
+		shop.setFrame(frameIndex);
+		shop.setDisplaySize(stallSize, stallSize); // Use setDisplaySize instead of setScale
+		shop.setInteractive({ useHandCursor: true });
+		shop.setDepth(0);
 
 		// Shop label
 		this.add
-			.text(x + shopWidth / 2, y + shopHeight / 2, label, {
+			.text(x + stallSize / 2, y + stallSize / 2, label, {
 				fontSize: "10px",
-				fill: "#000",
+				fill: "#fff",
 				fontFamily: "Arial",
 				fontStyle: "bold",
 				align: "center",
+				stroke: "#000",
+				strokeThickness: 3,
 			})
-			.setOrigin(0.5, 0.5);
+			.setOrigin(0.5, 0.5)
+			.setDepth(1);
 
 		// Click handler
 		shop.on("pointerdown", () => {
 			this.openShop(shopType);
 		});
 
-		// Hover effect
+		// Hover effect (tint)
 		shop.on("pointerover", () => {
-			shop.setFillStyle(Phaser.Display.Color.GetColor(255, 255, 255));
+			shop.setTint(0xcccccc);
 		});
 		shop.on("pointerout", () => {
-			shop.setFillStyle(color);
+			shop.clearTint();
 		});
 	}
 

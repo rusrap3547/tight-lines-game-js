@@ -23,17 +23,20 @@ A Phaser 3 fishing game featuring a two-stage skill-based catching system: hook 
 
 ### Stage 2: Rhythm Minigame (DDR Style)
 
+- **First Time Only**: Tutorial screen explains the game controls with an OK button
+- After clicking OK (first time only): 3-2-1 countdown begins
 - Right half of screen shows 4 lanes with falling arrows
 - **Yellow hit zone** at the bottom shows where to time your hits
 - Press **Arrow Keys** (←, ↑, ↓, →) or **WASD** when arrows enter the yellow zone
 - Match the arrow direction with your key press
-- **Hit Zone**: 40 pixels above and 20 pixels below center for forgiving timing
+- **Hit Zone**: 51 pixels above and 26 pixels below center for forgiving timing
 - Arrows spawn continuously every 0.8 seconds
-- **White progress bar** at the bottom fills as you hit arrows
-- **Timer**: 7 seconds to complete (no penalties for misses)
+- **Green progress bar** at the bottom fills as you hit arrows
+- **Timer**: 7 seconds base time (upgradeable with Line Strength)
 - **Required Hits**: Based on fish health (3-5 arrows typically)
 - ✅ **Success**: Catch the fish and earn points
 - ❌ **Failure**: Time runs out, fish escapes
+- **Tutorial**: Only shows the first time you play - uses localStorage to remember
 
 ### Controls
 
@@ -67,18 +70,20 @@ A Phaser 3 fishing game featuring a two-stage skill-based catching system: hook 
   - Failure causes fish to escape
   - Marker speed scales with fish speed (faster fish = harder timing)
 - ✅ **Rhythm Minigame (DDR Style)**:
+  - **Tutorial system**: First-time tutorial with instructions and OK button
+  - **Countdown**: 3-2-1 countdown with animations before game starts
+  - **localStorage**: Remembers if player has seen tutorial (shows only once)
   - Right half screen layout with 4 lanes
   - Arrows continuously spawn and fall to bottom
   - Yellow highlighted hit zone at bottom for easy visibility
   - Arrow Keys (←, ↑, ↓, →) or WASD controls
-  - Forgiving 60px hit zone (40px above, 20px below center)
+  - Forgiving 77px hit zone (51px above, 26px below center)
   - Required arrows based on fish health (3-5 typically)
-  - 7-second timer (no miss penalties)
-  - White horizontal progress bar shows completion
+  - 7-second base timer (no miss penalties)
+  - Green horizontal progress bar shows completion
   - Visual feedback for hits/misses
   - Dead arrows cleaned from memory automatically
   - Win = catch fish, Lose = time runs out
-- Trash items: 0 points
 
 ### Day/Night Cycle
 
@@ -92,12 +97,22 @@ A Phaser 3 fishing game featuring a two-stage skill-based catching system: hook 
 - ✅ **Dynamic Sky Colors**: Real-time color transitions
 - ✅ **UI Display**: Shows "Day X - Time" and "Casts: X/15"
 - ✅ **Auto Market Transition**: After 15 casts, goes to market to start new day
+
+### Market & Upgrade System
+
 - ✅ **Market Scene**: Accessible via button or auto-transition after 15 casts
+- ✅ **Custom Background Images**: Market dock and ocean backgrounds
+- ✅ **Market Stalls**: 4 randomized shop stalls (from 12 available designs)
 - ✅ **4 Shops**: Bait Shop, Line Shop, Rod Shop, Fish Buyer
 - ✅ **Money System**: 1 fish point = $1 in cash
 - ✅ **Auto Fish Sale**: Fish automatically sold when entering market
 - ✅ **Three Upgrade Types**:
   - **Line Strength**: +2s rhythm timer per level (max 10 levels)
+  - **Bait Quality**: +5% rare fish chance per level (max 10 levels)
+  - **Rod Power**: +0.25x size multiplier per level (max 3 levels)
+- ✅ **Progressive Costs**: Base price × 1.5^level
+- ✅ **Persistent Data**: Money and upgrades saved in registry
+- ✅ **Return to Dock**: Click "Return to Dock" to continue fishing
   - **Bait Quality**: +5% rare fish chance per level (max 10 levels)
   - **Rod Power**: +0.25x size multiplier per level (max 3 levels)
 - ✅ **Progressive Costs**: Base price × 1.5^level
@@ -648,30 +663,46 @@ Open http://localhost:5173
 
 ## 📝 Development Notes
 
-### Recent Changes
+### Recent Changes (January 2026)
 
-- Fixed spacebar input (works repeatedly without refocusing)
-- Simplified input to use `isDown` with state tracking
-- Removed placeholder miniGame.js and storyMode.js files
+**Rhythm Minigame Improvements:**
+
+- ✅ Added tutorial screen with instructions (shows only on first play)
+- ✅ Implemented 3-2-1 countdown before game starts
+- ✅ Tutorial state saved in localStorage (one-time display)
+- ✅ Improved first-time player experience
+- ✅ Two-stage catching system (hook timing + rhythm game)
+- ✅ WASD controls alongside arrow keys
+- ✅ Right-half screen layout for minigame
+
+**Market Scene Enhancements:**
+
+- ✅ Added custom market dock and ocean background images
+- ✅ Integrated 12 unique market stall sprites (128x128 each)
+- ✅ Randomized stall selection for 4 shops each visit
+- ✅ Updated shop UI to use sprite images
+- ⚠️ **Known Issue**: Spritesheet currently displaying full sheet instead of individual frames (debugging in progress)
+
+**Day/Night Cycle:**
+
+- ✅ Updated day cycle to 15 casts per day
+- ✅ Auto-transition to market after completing day
+- ✅ Marker speed scales with fish speed
 
 ### Known Issues
 
-- None currently
+- ⚠️ Market stall sprites showing entire spritesheet instead of individual 128x128 frames
+  - Spritesheet loaded correctly (4 rows × 3 columns, 384×512px total)
+  - Frame selection logic implemented but not cropping to single frames
+  - Shops are fully functional, visual issue only
+  - Will be resolved in next session
 
 ### Code Organization
 
 - All classes use config constants at top of file
 - Asset placeholders ready for when you add images
 - Easy to add new fish types in `FishTypes` object
-  ✅ Implemented two-stage catching system (hook timing + rhythm game)
-- ✅ Created rhythm minigame scene with DDR-style gameplay
-- ✅ Added WASD controls alongside arrow keys
-- ✅ Updated day cycle to 15 casts per day
-- ✅ Auto-transition to market after completing day
-- ✅ Marker speed now scales with fish speed
-- ✅ Right-half screen layout for minigame
-
-### Known Issues
+- localStorage used for persistent tutorial state
 
 - None currently
 
