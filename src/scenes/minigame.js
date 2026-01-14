@@ -370,7 +370,7 @@ export default class Minigame extends Phaser.Scene {
 
 		// Instruction title
 		const titleText = this.add
-			.text(minigameCenter, height / 2 - 60, "RHYTHM GAME", {
+			.text(minigameCenter, height / 2 - 120, "RHYTHM GAME", {
 				fontSize: "22px",
 				fill: "#ffff00",
 				fontFamily: "Arial",

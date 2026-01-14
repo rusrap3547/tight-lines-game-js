@@ -12,7 +12,7 @@ const MARKET_CONFIG = {
 	// Shop layout
 	SHOP_WIDTH: 77,
 	SHOP_HEIGHT: 64,
-	SHOP_SPACING: 19,
+	SHOP_SPACING: 12,
 	SHOP_Y: 102,
 
 	// Colors for shops
@@ -72,10 +72,10 @@ export default class marketScene extends Phaser.Scene {
 	}
 
 	preload() {
-		// Load market stalls sprite sheet (12 stalls, 4 rows x 3 columns, 128x128 each)
+		// Load market stalls sprite sheet (12 stalls, 3 columns x 4 rows)
 		this.load.spritesheet("marketStalls", "assets/images/Market/sprite.png", {
-			frameWidth: 128,
-			frameHeight: 128,
+			frameWidth: Math.floor(128 / 3),
+			frameHeight: 32,
 		});
 
 		// Load market background images
@@ -160,11 +160,11 @@ export default class marketScene extends Phaser.Scene {
 		}
 
 		// Position shops on the dock (bottom half)
-		const stallSize = 64; // Scale down from 128 to 64
+		const stallSize = 120; // Sized to fit all 4 stalls on screen
 		const shopSpacing = MARKET_CONFIG.SHOP_SPACING;
 		const totalShopWidth = stallSize * 4 + shopSpacing * 3;
 		const startX = (width - totalShopWidth) / 2;
-		const shopY = height * 0.5 + 20; // Position on dock (starts at 50% + some padding)
+		const shopY = height * 0.55; // Position on dock area to ensure visibility
 
 		// Bait Shop
 		this.createShop(

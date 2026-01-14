@@ -678,10 +678,12 @@ Open http://localhost:5173
 **Market Scene Enhancements:**
 
 - ✅ Added custom market dock and ocean background images
-- ✅ Integrated 12 unique market stall sprites (128x128 each)
-- ✅ Randomized stall selection for 4 shops each visit
-- ✅ Updated shop UI to use sprite images
-- ⚠️ **Known Issue**: Spritesheet currently displaying full sheet instead of individual frames (debugging in progress)
+- ✅ Created 12 unique market stall spritesheet (3 columns × 4 rows, 128x128px total)
+- ✅ Spritesheet properly split into 12 individual frames (~42×32px each)
+- ✅ Randomized stall selection for 4 shops each visit (no duplicates)
+- ✅ Updated shop UI to use individual sprite frames
+- ✅ Stalls properly sized and spaced (120px each, 12px spacing)
+- ✅ All 4 stalls visible on screen with proper viewport margins
 
 **Day/Night Cycle:**
 
@@ -691,11 +693,7 @@ Open http://localhost:5173
 
 ### Known Issues
 
-- ⚠️ Market stall sprites showing entire spritesheet instead of individual 128x128 frames
-  - Spritesheet loaded correctly (4 rows × 3 columns, 384×512px total)
-  - Frame selection logic implemented but not cropping to single frames
-  - Shops are fully functional, visual issue only
-  - Will be resolved in next session
+- None currently
 
 ### Code Organization
 
