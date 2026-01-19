@@ -397,13 +397,13 @@ export default class marketScene extends Phaser.Scene {
 		if (shopType === "buyer") {
 			// Fish Buyer - Show current score and sell button
 			const currentScore = this.registry.get("currentScore") || 0;
-			const moneyValue = Math.floor(currentScore * 0.05);
+			const moneyValue = Math.floor(currentScore * 0.1);
 
 			infoText = this.add
 				.text(
 					width / 2,
 					height / 2 - 20,
-					`Sell fish for gold!\n\nCurrent Fish: ${currentScore} points\nValue: ${moneyValue} gold\n\n1 gold for every 20 points`,
+					`Sell fish for gold!\n\nCurrent Fish: ${currentScore} points\nValue: ${moneyValue} gold\n\n1 gold for every 10 points`,
 					{
 						fontSize: "9px",
 						fill: "#000",
@@ -433,7 +433,7 @@ export default class marketScene extends Phaser.Scene {
 					// Sell fish for money
 					const score = this.registry.get("currentScore") || 0;
 					if (score > 0) {
-						const moneyEarned = Math.floor(score * 0.05);
+						const moneyEarned = Math.floor(score * 0.1);
 						const currentMoney = this.registry.get("playerMoney");
 						this.registry.set("playerMoney", currentMoney + moneyEarned);
 						this.registry.set("currentScore", 0);

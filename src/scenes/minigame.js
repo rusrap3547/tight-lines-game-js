@@ -791,6 +791,15 @@ export default class Minigame extends Phaser.Scene {
 						`Caught ${this.fishData.fishType}! +${this.fishData.points} points`,
 					);
 				}
+
+				// Add to day catches for end-of-day stats
+				const dockScene = this.scene.get("DockScene");
+				if (dockScene && dockScene.dayCatches) {
+					dockScene.dayCatches.push({
+						fishType: this.fishData.fishType,
+						points: this.fishData.points,
+					});
+				}
 			} else {
 				console.log(`❌ ${this.fishData.fishType} got away!`);
 			}
