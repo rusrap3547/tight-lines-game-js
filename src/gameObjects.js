@@ -47,7 +47,7 @@ export class Player {
 					y,
 					PLAYER_CONFIG.WIDTH,
 					PLAYER_CONFIG.HEIGHT,
-					PLAYER_CONFIG.COLOR
+					PLAYER_CONFIG.COLOR,
 				)
 				.setOrigin(0.5, 1);
 		}
@@ -91,7 +91,7 @@ export class Bobber {
 				x,
 				y,
 				BOBBER_CONFIG.RADIUS,
-				BOBBER_CONFIG.COLOR
+				BOBBER_CONFIG.COLOR,
 			);
 		}
 
@@ -107,7 +107,7 @@ export class Bobber {
 			"cast() called - isCasting:",
 			this.isCasting,
 			"isReturning:",
-			this.isReturning
+			this.isReturning,
 		);
 		if (!this.isCasting && !this.isReturning) {
 			console.log("CASTING BOBBER");
@@ -153,7 +153,7 @@ export class Bobber {
 			this.sprite.x,
 			this.sprite.y - 20,
 			this.sprite.x,
-			this.sprite.y
+			this.sprite.y,
 		);
 	}
 
@@ -164,7 +164,7 @@ export class Bobber {
 			this.sprite.x - radius,
 			this.sprite.y - radius,
 			radius * 2,
-			radius * 2
+			radius * 2,
 		);
 	}
 }
@@ -199,7 +199,7 @@ export class Fish {
 				y,
 				fishWidth,
 				fishHeight,
-				this.color
+				this.color,
 			);
 		}
 
@@ -246,7 +246,7 @@ export class Fish {
 			this.x - fishWidth / 2,
 			this.y - fishHeight / 2,
 			fishWidth,
-			fishHeight
+			fishHeight,
 		);
 	}
 }
@@ -263,7 +263,7 @@ export const FishTypes = {
 		speed: 120,
 		health: 1,
 		points: 1,
-		size: 0.5,
+		size: 0.2,
 		fishType: "guppy",
 		habitat: "freshwater",
 		isTrash: false,
@@ -274,7 +274,7 @@ export const FishTypes = {
 		speed: 110,
 		health: 1,
 		points: 1,
-		size: 0.6,
+		size: 0.2,
 		fishType: "neon tetra",
 		habitat: "freshwater",
 		isTrash: false,
@@ -285,7 +285,7 @@ export const FishTypes = {
 		speed: 130,
 		health: 1,
 		points: 1,
-		size: 0.5,
+		size: 0.2,
 		fishType: "silverjaw minnow",
 		habitat: "freshwater",
 		isTrash: false,
@@ -296,7 +296,7 @@ export const FishTypes = {
 		speed: 85,
 		health: 2,
 		points: 2,
-		size: 0.7,
+		size: 0.4,
 		fishType: "goldfish",
 		habitat: "freshwater",
 		isTrash: false,
@@ -307,7 +307,7 @@ export const FishTypes = {
 		speed: 100,
 		health: 2,
 		points: 2,
-		size: 0.8,
+		size: 0.5,
 		fishType: "bluegill",
 		habitat: "freshwater",
 		isTrash: false,
@@ -316,7 +316,7 @@ export const FishTypes = {
 		assetKey: "yellow_perch",
 		color: 0xffd700,
 		speed: 95,
-		health: 3,
+		health: 6,
 		points: 3,
 		size: 0.9,
 		fishType: "yellow perch",
@@ -328,7 +328,7 @@ export const FishTypes = {
 		assetKey: "angelfish",
 		color: 0xffb6c1,
 		speed: 75,
-		health: 3,
+		health: 6,
 		points: 4,
 		size: 1.0,
 		fishType: "angelfish",
@@ -339,7 +339,7 @@ export const FishTypes = {
 		assetKey: "carp",
 		color: 0xcd853f,
 		speed: 70,
-		health: 4,
+		health: 10,
 		points: 3,
 		size: 1.2,
 		fishType: "carp",
@@ -350,7 +350,7 @@ export const FishTypes = {
 		assetKey: "rainbow_trout",
 		color: 0x8bc34a,
 		speed: 90,
-		health: 3,
+		health: 6,
 		points: 3,
 		size: 1.0,
 		fishType: "rainbow trout",
@@ -361,7 +361,7 @@ export const FishTypes = {
 		assetKey: "salmon",
 		color: 0xff6b9d,
 		speed: 120,
-		health: 4,
+		health: 10,
 		points: 5,
 		size: 1.2,
 		fishType: "salmon",
@@ -372,7 +372,7 @@ export const FishTypes = {
 		assetKey: "bass",
 		color: 0x795548,
 		speed: 80,
-		health: 5,
+		health: 12,
 		points: 6,
 		size: 1.3,
 		fishType: "bass",
@@ -384,7 +384,7 @@ export const FishTypes = {
 		assetKey: "catfish",
 		color: 0x607d8b,
 		speed: 60,
-		health: 6,
+		health: 15,
 		points: 8,
 		size: 1.5,
 		fishType: "catfish",
@@ -396,7 +396,7 @@ export const FishTypes = {
 		assetKey: "arowana",
 		color: 0xffd700,
 		speed: 140,
-		health: 7,
+		health: 18,
 		points: 15,
 		size: 1.7,
 		fishType: "arowana",
@@ -408,7 +408,7 @@ export const FishTypes = {
 		assetKey: "gar",
 		color: 0xff0000,
 		speed: 170,
-		health: 3,
+		health: 6,
 		points: 0,
 		size: 0.9,
 		fishType: "gar",
@@ -423,7 +423,7 @@ export const FishTypes = {
 		assetKey: "anchovy",
 		color: 0xb0c4de,
 		speed: 140,
-		health: 1,
+		health: 3,
 		points: 1,
 		size: 0.5,
 		fishType: "anchovy",
@@ -434,7 +434,7 @@ export const FishTypes = {
 		assetKey: "goby",
 		color: 0x87ceeb,
 		speed: 100,
-		health: 2,
+		health: 4,
 		points: 2,
 		size: 0.6,
 		fishType: "goby",
@@ -445,7 +445,7 @@ export const FishTypes = {
 		assetKey: "clownfish",
 		color: 0xff8c00,
 		speed: 90,
-		health: 2,
+		health: 5,
 		points: 2,
 		size: 0.7,
 		fishType: "clownfish",
@@ -456,7 +456,7 @@ export const FishTypes = {
 		assetKey: "seahorse",
 		color: 0xffdab9,
 		speed: 50,
-		health: 2,
+		health: 5,
 		points: 3,
 		size: 0.8,
 		fishType: "seahorse",
@@ -468,7 +468,7 @@ export const FishTypes = {
 		assetKey: "blue_angelfish",
 		color: 0x1e90ff,
 		speed: 80,
-		health: 3,
+		health: 6,
 		points: 4,
 		size: 1.0,
 		fishType: "blue angelfish",
@@ -479,7 +479,7 @@ export const FishTypes = {
 		assetKey: "yellow_tang",
 		color: 0xffff00,
 		speed: 95,
-		health: 3,
+		health: 6,
 		points: 4,
 		size: 0.9,
 		fishType: "yellow tang",
@@ -490,7 +490,7 @@ export const FishTypes = {
 		assetKey: "purple_tang",
 		color: 0x9370db,
 		speed: 95,
-		health: 3,
+		health: 6,
 		points: 4,
 		size: 0.9,
 		fishType: "purple tang",
@@ -501,7 +501,7 @@ export const FishTypes = {
 		assetKey: "surgeonfish",
 		color: 0x4682b4,
 		speed: 100,
-		health: 3,
+		health: 6,
 		points: 3,
 		size: 1.0,
 		fishType: "surgeonfish",
@@ -512,7 +512,7 @@ export const FishTypes = {
 		assetKey: "pufferfish",
 		color: 0xffa07a,
 		speed: 70,
-		health: 4,
+		health: 9,
 		points: 5,
 		size: 1.1,
 		fishType: "pufferfish",
@@ -523,7 +523,7 @@ export const FishTypes = {
 		assetKey: "flounder",
 		color: 0xd2b48c,
 		speed: 60,
-		health: 4,
+		health: 10,
 		points: 5,
 		size: 1.2,
 		fishType: "flounder",
@@ -534,7 +534,7 @@ export const FishTypes = {
 		assetKey: "ribbon_eel",
 		color: 0x4169e1,
 		speed: 110,
-		health: 4,
+		health: 12,
 		points: 6,
 		size: 1.3,
 		fishType: "ribbon eel",
@@ -545,7 +545,7 @@ export const FishTypes = {
 		assetKey: "moray_eel",
 		color: 0x2f4f4f,
 		speed: 90,
-		health: 5,
+		health: 13,
 		points: 7,
 		size: 1.4,
 		fishType: "moray eel",
@@ -557,7 +557,7 @@ export const FishTypes = {
 		assetKey: "blue_groper",
 		color: 0x0000cd,
 		speed: 75,
-		health: 5,
+		health: 15,
 		points: 7,
 		size: 1.5,
 		fishType: "blue groper",
@@ -568,7 +568,7 @@ export const FishTypes = {
 		assetKey: "napoleon_wrasse",
 		color: 0x20b2aa,
 		speed: 70,
-		health: 6,
+		health: 17,
 		points: 9,
 		size: 1.6,
 		fishType: "napoleon wrasse",
@@ -579,7 +579,7 @@ export const FishTypes = {
 		assetKey: "tuna",
 		color: 0x191970,
 		speed: 150,
-		health: 5,
+		health: 13,
 		points: 10,
 		size: 1.4,
 		fishType: "tuna",
@@ -590,7 +590,7 @@ export const FishTypes = {
 		assetKey: "stingray",
 		color: 0x696969,
 		speed: 80,
-		health: 6,
+		health: 18,
 		points: 12,
 		size: 1.7,
 		fishType: "stingray",
@@ -602,7 +602,7 @@ export const FishTypes = {
 		assetKey: "anglerfish",
 		color: 0x4b0082,
 		speed: 50,
-		health: 7,
+		health: 15,
 		points: 14,
 		size: 1.5,
 		fishType: "anglerfish",
@@ -613,7 +613,7 @@ export const FishTypes = {
 		assetKey: "great_white_shark",
 		color: 0x778899,
 		speed: 160,
-		health: 8,
+		health: 35,
 		points: 25,
 		size: 2.5,
 		fishType: "great white shark",
@@ -681,7 +681,7 @@ export const OtherItems = {
 		assetKey: "crab_blue",
 		color: 0x1e90ff,
 		speed: 65,
-		health: 3,
+		health: 6,
 		points: 4,
 		size: 0.9,
 		fishType: "blue crab",
@@ -692,7 +692,7 @@ export const OtherItems = {
 		assetKey: "crab_dungeness",
 		color: 0xcd853f,
 		speed: 60,
-		health: 4,
+		health: 6,
 		points: 5,
 		size: 1.0,
 		fishType: "dungeness crab",
@@ -703,7 +703,7 @@ export const OtherItems = {
 		assetKey: "crab_king",
 		color: 0xdc143c,
 		speed: 55,
-		health: 5,
+		health: 12,
 		points: 9,
 		size: 1.3,
 		fishType: "king crab",
@@ -822,7 +822,7 @@ export function getFishByHabitat(habitat) {
 	const allFish = { ...FishTypes, ...OtherItems };
 	return Object.entries(allFish)
 		.filter(
-			([_, config]) => config.habitat === habitat || config.habitat === "both"
+			([_, config]) => config.habitat === habitat || config.habitat === "both",
 		)
 		.reduce((obj, [key, value]) => {
 			obj[key] = value;

@@ -9,11 +9,9 @@ const MARKET_CONFIG = {
 	OCEAN_COLOR: 0x4a90e2,
 	DOCK_COLOR: 0x8b4513,
 
-	// Shop layout
-	SHOP_WIDTH: 77,
-	SHOP_HEIGHT: 64,
-	SHOP_SPACING: 12,
-	SHOP_Y: 102,
+	// Shop layout (calculated dynamically)
+	// Stalls are 60% of dock height
+	// All 4 stalls + spacing take up 80% of width
 
 	// Colors for shops
 	BAIT_SHOP_COLOR: 0xffb6c1,
@@ -160,11 +158,26 @@ export default class marketScene extends Phaser.Scene {
 		}
 
 		// Position shops on the dock (bottom half)
-		const stallSize = 120; // Sized to fit all 4 stalls on screen
-		const shopSpacing = MARKET_CONFIG.SHOP_SPACING;
-		const totalShopWidth = stallSize * 4 + shopSpacing * 3;
-		const startX = (width - totalShopWidth) / 2;
-		const shopY = height * 0.55; // Position on dock area to ensure visibility
+		// Dock is bottom 50% of screen (height * 0.5)
+		const dockHeight = height * 0.5;
+
+		// Stalls are 60% of dock height
+		const stallHeight = dockHeight * 0.6;
+		// Make stalls square
+		const stallSize = stallHeight;
+
+		// All 4 stalls + spacing = 80% of screen width
+		const totalAvailableWidth = width * 0.8;
+		// Calculate spacing: 3 gaps between 4 stalls
+		// Distribute remaining space after stalls as spacing
+		const spacingTotal = totalAvailableWidth - stallSize * 4;
+		const shopSpacing = spacingTotal / 3;
+
+		// Center the stalls horizontally
+		const startX = (width - totalAvailableWidth) / 2;
+		// Position vertically: center stalls in dock area
+		const dockStartY = height * 0.5;
+		const shopY = dockStartY + (dockHeight - stallSize) / 2;
 
 		// Bait Shop
 		this.createShop(
@@ -173,7 +186,8 @@ export default class marketScene extends Phaser.Scene {
 			"BAIT\nSHOP",
 			MARKET_CONFIG.BAIT_SHOP_COLOR,
 			"bait",
-			selectedFrames[0]
+			selectedFrames[0],
+			stallSize,
 		);
 
 		// Line Shop
@@ -183,7 +197,8 @@ export default class marketScene extends Phaser.Scene {
 			"LINE\nSHOP",
 			MARKET_CONFIG.LINE_SHOP_COLOR,
 			"line",
-			selectedFrames[1]
+			selectedFrames[1],
+			stallSize,
 		);
 
 		// Rod Shop
@@ -193,7 +208,8 @@ export default class marketScene extends Phaser.Scene {
 			"ROD\nSHOP",
 			MARKET_CONFIG.ROD_SHOP_COLOR,
 			"rod",
-			selectedFrames[2]
+			selectedFrames[2],
+			stallSize,
 		);
 
 		// Fish Buyer
@@ -203,7 +219,8 @@ export default class marketScene extends Phaser.Scene {
 			"FISH\nBUYER",
 			MARKET_CONFIG.BUYER_SHOP_COLOR,
 			"buyer",
-			selectedFrames[3]
+			selectedFrames[3],
+			stallSize,
 		);
 
 		// ============================================
@@ -219,7 +236,7 @@ export default class marketScene extends Phaser.Scene {
 				MARKET_CONFIG.ARROW_SIZE / 2,
 				MARKET_CONFIG.ARROW_SIZE,
 				-MARKET_CONFIG.ARROW_SIZE / 2,
-				MARKET_CONFIG.ARROW_COLOR
+				MARKET_CONFIG.ARROW_COLOR,
 			)
 			.setInteractive({ useHandCursor: true });
 
@@ -247,14 +264,12 @@ export default class marketScene extends Phaser.Scene {
 			.setOrigin(0, 0.5);
 	}
 
-	createShop(x, y, label, color, shopType, frameIndex) {
-		const stallSize = 64;
-
+	createShop(x, y, label, color, shopType, frameIndex, stallSize) {
 		// Create a sprite and set the specific frame
 		const shop = this.add.sprite(
 			x + stallSize / 2,
 			y + stallSize / 2,
-			"marketStalls"
+			"marketStalls",
 		);
 
 		// Set the frame name - spritesheet frames are indexed starting from __BASE for frame 0
@@ -329,7 +344,7 @@ export default class marketScene extends Phaser.Scene {
 			nextValue = currentValue + UPGRADE_CONFIG.LINE.increment;
 			cost = Math.floor(
 				UPGRADE_CONFIG.LINE.baseCost *
-					Math.pow(UPGRADE_CONFIG.LINE.costMultiplier, currentLevel)
+					Math.pow(UPGRADE_CONFIG.LINE.costMultiplier, currentLevel),
 			);
 			maxLevel = UPGRADE_CONFIG.LINE.maxLevel;
 			valueUnit = "s";
@@ -344,7 +359,7 @@ export default class marketScene extends Phaser.Scene {
 			nextValue = currentValue + UPGRADE_CONFIG.BAIT.increment * 100;
 			cost = Math.floor(
 				UPGRADE_CONFIG.BAIT.baseCost *
-					Math.pow(UPGRADE_CONFIG.BAIT.costMultiplier, currentLevel)
+					Math.pow(UPGRADE_CONFIG.BAIT.costMultiplier, currentLevel),
 			);
 			maxLevel = UPGRADE_CONFIG.BAIT.maxLevel;
 			valueUnit = "%";
@@ -358,7 +373,7 @@ export default class marketScene extends Phaser.Scene {
 			nextValue = currentValue + UPGRADE_CONFIG.ROD.increment;
 			cost = Math.floor(
 				UPGRADE_CONFIG.ROD.baseCost *
-					Math.pow(UPGRADE_CONFIG.ROD.costMultiplier, currentLevel)
+					Math.pow(UPGRADE_CONFIG.ROD.costMultiplier, currentLevel),
 			);
 			maxLevel = UPGRADE_CONFIG.ROD.maxLevel;
 			valueUnit = "x";
@@ -394,7 +409,7 @@ export default class marketScene extends Phaser.Scene {
 						fill: "#000",
 						fontFamily: "Arial",
 						align: "center",
-					}
+					},
 				)
 				.setOrigin(0.5, 0.5);
 
@@ -448,15 +463,15 @@ export default class marketScene extends Phaser.Scene {
 						shopTitle === "Bait Shop"
 							? "better bait"
 							: shopTitle === "Line Shop"
-							? "stronger lines"
-							: "upgraded rods"
+								? "stronger lines"
+								: "upgraded rods"
 					}\nto improve your fishing.`,
 					{
 						fontSize: "10px",
 						fill: "#000",
 						fontFamily: "Arial",
 						align: "center",
-					}
+					},
 				)
 				.setOrigin(0.5, 0.5);
 

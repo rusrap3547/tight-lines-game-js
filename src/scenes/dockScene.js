@@ -106,13 +106,13 @@ export default class dockScene extends Phaser.Scene {
 		this.load.image("layer_shadowTrees", "assets/images/Dock/2shadowTrees.png");
 		this.load.image(
 			"layer_backgroundTrees",
-			"assets/images/Dock/3backgroundTrees.png"
+			"assets/images/Dock/3backgroundTrees.png",
 		);
 		this.load.image("layer_middleTrees", "assets/images/Dock/4middleTrees.png");
 		this.load.image("layer_frontTrees", "assets/images/Dock/5frontTrees.png");
 		this.load.image(
 			"layer_horizonAndSea",
-			"assets/images/Dock/6horizonAndSea.png"
+			"assets/images/Dock/6horizonAndSea.png",
 		);
 		this.load.image("layer_oceanFloor", "assets/images/Dock/7oceanFloor.png");
 		this.load.image("layer_pondWater", "assets/images/Dock/8pondWater.png");
@@ -123,17 +123,17 @@ export default class dockScene extends Phaser.Scene {
 		this.load.spritesheet(
 			"fisherman_idle",
 			"assets/sprites/1 Fisherman/Fisherman_idle.png",
-			{ frameWidth: 48, frameHeight: 48 }
+			{ frameWidth: 48, frameHeight: 48 },
 		);
 		this.load.spritesheet(
 			"fisherman_fish",
 			"assets/sprites/1 Fisherman/Fisherman_fish.png",
-			{ frameWidth: 48, frameHeight: 48 }
+			{ frameWidth: 48, frameHeight: 48 },
 		);
 		this.load.spritesheet(
 			"fisherman_hook",
 			"assets/sprites/1 Fisherman/Fisherman_hook.png",
-			{ frameWidth: 48, frameHeight: 48 }
+			{ frameWidth: 48, frameHeight: 48 },
 		);
 
 		// Load worm sprite for bobber
@@ -144,19 +144,19 @@ export default class dockScene extends Phaser.Scene {
 		this.load.image("neon_tetra", "assets/sprites/Fresh Water/Neon Tetra.png");
 		this.load.image(
 			"silverjaw_minnow",
-			"assets/sprites/Fresh Water/Silverjaw Minnow.png"
+			"assets/sprites/Fresh Water/Silverjaw Minnow.png",
 		);
 		this.load.image("goldfish", "assets/sprites/Fresh Water/Goldfish.png");
 		this.load.image("bluegill", "assets/sprites/Fresh Water/Bluegill.png");
 		this.load.image(
 			"yellow_perch",
-			"assets/sprites/Fresh Water/Yellow Perch.png"
+			"assets/sprites/Fresh Water/Yellow Perch.png",
 		);
 		this.load.image("angelfish", "assets/sprites/Fresh Water/Angelfish.png");
 		this.load.image("carp", "assets/sprites/Fresh Water/Carp.png");
 		this.load.image(
 			"rainbow_trout",
-			"assets/sprites/Fresh Water/Rainbow Trout.png"
+			"assets/sprites/Fresh Water/Rainbow Trout.png",
 		);
 		this.load.image("salmon", "assets/sprites/Fresh Water/Salmon.png");
 		this.load.image("bass", "assets/sprites/Fresh Water/Bass.png");
@@ -171,7 +171,7 @@ export default class dockScene extends Phaser.Scene {
 		this.load.image("seahorse", "assets/sprites/Salt Water/Seahorse.png");
 		this.load.image(
 			"blue_angelfish",
-			"assets/sprites/Salt Water/Blue Angelfish.png"
+			"assets/sprites/Salt Water/Blue Angelfish.png",
 		);
 		this.load.image("yellow_tang", "assets/sprites/Salt Water/Yellow Tang.png");
 		this.load.image("purple_tang", "assets/sprites/Salt Water/Purple Tang.png");
@@ -184,27 +184,27 @@ export default class dockScene extends Phaser.Scene {
 		this.load.image("blue_groper", "assets/sprites/Salt Water/Blue Groper.png");
 		this.load.image(
 			"napoleon_wrasse",
-			"assets/sprites/Salt Water/Napoleon Wrasse.png"
+			"assets/sprites/Salt Water/Napoleon Wrasse.png",
 		);
 		this.load.image("stingray", "assets/sprites/Salt Water/Stingray.png");
 		this.load.image("anglerfish", "assets/sprites/Salt Water/Anglerfish.png");
 		this.load.image(
 			"great_white_shark",
-			"assets/sprites/Salt Water/Great White Shark.png"
+			"assets/sprites/Salt Water/Great White Shark.png",
 		);
 
 		// Load crustaceans and other marine life
 		this.load.image("crab_blue", "assets/sprites/Salt Water/Crab - Blue.png");
 		this.load.image(
 			"crab_dungeness",
-			"assets/sprites/Salt Water/Crab - Dungeness.png"
+			"assets/sprites/Salt Water/Crab - Dungeness.png",
 		);
 		this.load.image("crab_king", "assets/sprites/Salt Water/Crab - King.png");
 		this.load.image("shrimp", "assets/sprites/Salt Water/Shrimp.png");
 		this.load.image("jellyfish", "assets/sprites/Salt Water/Jellyfish.png");
 		this.load.image(
 			"upside_down_jellyfish",
-			"assets/sprites/Salt Water/Upside Down Jellyfish.png"
+			"assets/sprites/Salt Water/Upside Down Jellyfish.png",
 		);
 		this.load.image("starfish", "assets/sprites/Salt Water/Starfish.png");
 		this.load.image("mussel", "assets/sprites/Fresh Water/Mussel.png");
@@ -492,11 +492,18 @@ export default class dockScene extends Phaser.Scene {
 	}
 
 	getWeightedRandomFishType() {
-		// Roll for trash first
+		// Roll for super rare Bottle first (0.03% chance = ~1 per hour at 2 spawns/sec)
+		const bottleRoll = Math.random();
+		if (bottleRoll < 0.0003) {
+			console.log("🍾 SUPER RARE BOTTLE SPAWNED!");
+			return { type: "Bottle", isTrash: true };
+		}
+
+		// Roll for regular trash (but exclude Bottle from regular trash pool)
 		const trashRoll = Math.random();
 		if (trashRoll < GAME_CONFIG.TRASH_SPAWN_CHANCE) {
-			// Spawn trash
-			const trashTypes = ["RustyCan", "Bottle", "AppleCore", "Seaweed"];
+			// Spawn trash (without Bottle)
+			const trashTypes = ["RustyCan", "AppleCore", "Seaweed"];
 			return { type: Phaser.Math.RND.pick(trashTypes), isTrash: true };
 		}
 
@@ -541,7 +548,7 @@ export default class dockScene extends Phaser.Scene {
 		// Spawn random fish
 		const fishCount = Phaser.Math.Between(
 			GAME_CONFIG.INITIAL_SPAWN_MIN,
-			GAME_CONFIG.INITIAL_SPAWN_MAX
+			GAME_CONFIG.INITIAL_SPAWN_MAX,
 		);
 
 		for (let i = 0; i < fishCount; i++) {
@@ -592,7 +599,7 @@ export default class dockScene extends Phaser.Scene {
 			const fishNearEdges = this.fish.filter(
 				(fish) =>
 					fish.x <= this.waterLeft + edgeThreshold ||
-					fish.x >= this.waterRight - edgeThreshold
+					fish.x >= this.waterRight - edgeThreshold,
 			);
 
 			// If there are fish near edges, remove one of them
@@ -691,7 +698,7 @@ export default class dockScene extends Phaser.Scene {
 				time +
 				Phaser.Math.Between(
 					GAME_CONFIG.SPAWN_INTERVAL_MIN,
-					GAME_CONFIG.SPAWN_INTERVAL_MAX
+					GAME_CONFIG.SPAWN_INTERVAL_MAX,
 				);
 		}
 
@@ -705,7 +712,7 @@ export default class dockScene extends Phaser.Scene {
 				time +
 				Phaser.Math.Between(
 					GAME_CONFIG.DESPAWN_INTERVAL_MIN,
-					GAME_CONFIG.DESPAWN_INTERVAL_MAX
+					GAME_CONFIG.DESPAWN_INTERVAL_MAX,
 				);
 		}
 	}
@@ -714,7 +721,7 @@ export default class dockScene extends Phaser.Scene {
 		// Update cast counter display
 		const castsInDay = this.castCount % DAY_CYCLE_CONFIG.CASTS_PER_DAY;
 		this.castText.setText(
-			`Casts: ${castsInDay}/${DAY_CYCLE_CONFIG.CASTS_PER_DAY}`
+			`Casts: ${castsInDay}/${DAY_CYCLE_CONFIG.CASTS_PER_DAY}`,
 		);
 
 		// Calculate current day

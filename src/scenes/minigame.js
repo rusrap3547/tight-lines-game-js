@@ -50,14 +50,18 @@ export default class Minigame extends Phaser.Scene {
 		this.fishData = data.fish || { health: 3, fishType: "generic", points: 10 };
 		this.currentScore = data.score || 0;
 
-		// Check if player has seen the tutorial before
-		const hasSeenTutorial =
-			localStorage.getItem("rhythmGameTutorialSeen") === "true";
+		// Check if this is the first minigame of this session
+		if (!this.registry.has("tutorialSeenThisSession")) {
+			this.registry.set("tutorialSeenThisSession", false);
+		}
+		const hasSeenTutorialThisSession = this.registry.get(
+			"tutorialSeenThisSession",
+		);
 
 		// State management for instructions and countdown
-		this.showingInstructions = !hasSeenTutorial; // Only show if not seen before
+		this.showingInstructions = !hasSeenTutorialThisSession; // Show on first cast each session
 		this.showingCountdown = false;
-		this.gameStarted = hasSeenTutorial; // Skip straight to game if tutorial already seen
+		this.gameStarted = hasSeenTutorialThisSession; // Skip straight to game if already seen this session
 	}
 
 	preload() {
@@ -69,19 +73,19 @@ export default class Minigame extends Phaser.Scene {
 
 		this.load.image(
 			"hollowLeftArrow",
-			"assets/images/minigame/hollowleftArrow.png"
+			"assets/images/minigame/hollowleftArrow.png",
 		);
 		this.load.image(
 			"hollowUpArrow",
-			"assets/images/minigame/hollowUpArrow.png"
+			"assets/images/minigame/hollowUpArrow.png",
 		);
 		this.load.image(
 			"hollowDownArrow",
-			"assets/images/minigame/hollowDownArrow.png"
+			"assets/images/minigame/hollowDownArrow.png",
 		);
 		this.load.image(
 			"hollowRightArrow",
-			"assets/images/minigame/hollowRightArrow.png"
+			"assets/images/minigame/hollowRightArrow.png",
 		);
 
 		// Load fishing rod sprite sheet (12 frames across, 8 rows down, 64x64 per frame)
@@ -91,7 +95,7 @@ export default class Minigame extends Phaser.Scene {
 			{
 				frameWidth: 64,
 				frameHeight: 64,
-			}
+			},
 		);
 	}
 
@@ -113,7 +117,7 @@ export default class Minigame extends Phaser.Scene {
 				0,
 				minigameWidth,
 				height,
-				MINIGAME_CONFIG.BACKGROUND_COLOR
+				MINIGAME_CONFIG.BACKGROUND_COLOR,
 			)
 			.setOrigin(0, 0);
 
@@ -180,7 +184,7 @@ export default class Minigame extends Phaser.Scene {
 		// Update timer
 		this.timeRemaining -= delta / 1000;
 		this.timerText.setText(
-			`Time: ${Math.max(0, this.timeRemaining).toFixed(1)}s`
+			`Time: ${Math.max(0, this.timeRemaining).toFixed(1)}s`,
 		);
 
 		// Check if time ran out
@@ -391,7 +395,7 @@ export default class Minigame extends Phaser.Scene {
 					fontFamily: "Arial",
 					align: "center",
 					lineSpacing: 5,
-				}
+				},
 			)
 			.setOrigin(0.5)
 			.setDepth(201);
@@ -430,8 +434,8 @@ export default class Minigame extends Phaser.Scene {
 
 		// OK button click handler
 		okButton.on("pointerdown", () => {
-			// Mark tutorial as seen in localStorage
-			localStorage.setItem("rhythmGameTutorialSeen", "true");
+			// Mark tutorial as seen for this session
+			this.registry.set("tutorialSeenThisSession", true);
 
 			// Destroy instruction screen
 			instructionOverlay.destroy();
@@ -546,7 +550,7 @@ export default class Minigame extends Phaser.Scene {
 				fill: MINIGAME_CONFIG.TIMER_COLOR,
 				fontFamily: "Arial",
 				fontStyle: "bold",
-			}
+			},
 		);
 
 		// Arrows hit counter
@@ -561,7 +565,7 @@ export default class Minigame extends Phaser.Scene {
 				fill: "#ffffff",
 				fontFamily: "Arial",
 				fontStyle: "bold",
-			}
+			},
 		);
 
 		// Create horizontal success bar at the bottom of right half
@@ -580,7 +584,7 @@ export default class Minigame extends Phaser.Scene {
 				successBarY,
 				successBarWidth + 10,
 				MINIGAME_CONFIG.SUCCESS_BAR_HEIGHT + 10,
-				0xffffff
+				0xffffff,
 			)
 			.setOrigin(0.5);
 
@@ -591,7 +595,7 @@ export default class Minigame extends Phaser.Scene {
 				successBarY,
 				successBarWidth,
 				MINIGAME_CONFIG.SUCCESS_BAR_HEIGHT,
-				0x333333
+				0x333333,
 			)
 			.setOrigin(0.5);
 
@@ -602,7 +606,7 @@ export default class Minigame extends Phaser.Scene {
 				successBarY,
 				0,
 				MINIGAME_CONFIG.SUCCESS_BAR_HEIGHT,
-				0x00ff00
+				0x00ff00,
 			)
 			.setOrigin(0, 0.5);
 
@@ -628,7 +632,7 @@ export default class Minigame extends Phaser.Scene {
 				hitZoneWidth,
 				hitZoneHeight,
 				0xffff00,
-				0.15
+				0.15,
 			)
 			.setOrigin(0.5);
 
@@ -650,7 +654,7 @@ export default class Minigame extends Phaser.Scene {
 				y,
 				`hollow${
 					arrowTypes[i].charAt(0).toUpperCase() + arrowTypes[i].slice(1)
-				}Arrow`
+				}Arrow`,
 			);
 			this.hitZones.push({ x, y, type: arrowTypes[i], sprite: hollowArrow });
 		}
@@ -735,15 +739,35 @@ export default class Minigame extends Phaser.Scene {
 
 		// Return to dock scene on click
 		this.input.once("pointerdown", () => {
+			// Check if it's a bottle - show special message
+			if (success && this.fishData.fishType === "bottle") {
+				this.showBottleMessage();
+				return;
+			}
+
+			// Check if it's a gar - steals last fish!
+			if (success && this.fishData.fishType === "gar") {
+				this.showGarMessage();
+				return;
+			}
+
 			const updatedScore = success
 				? this.currentScore + this.fishData.points
 				: this.currentScore;
 
 			// Log catch for console feedback
 			if (success) {
+				// Store this catch as the last fish (but not trash or gar)
+				if (this.fishData.points > 0 && this.fishData.fishType !== "gar") {
+					this.registry.set("lastFishCaught", {
+						fishType: this.fishData.fishType,
+						points: this.fishData.points,
+					});
+				}
+
 				if (this.fishData.fishType === "gar") {
 					console.log(
-						`⚠️ EVIL GAR! Watch out! +${this.fishData.points} points`
+						`⚠️ EVIL GAR! Watch out! +${this.fishData.points} points`,
 					);
 				} else if (this.fishData.points === 0) {
 					console.log(`🗑️ Caught trash: ${this.fishData.fishType}!`);
@@ -752,7 +776,7 @@ export default class Minigame extends Phaser.Scene {
 					this.fishData.fishType === "great white shark"
 				) {
 					console.log(
-						`🎉 LEGENDARY CATCH! ${this.fishData.fishType}! +${this.fishData.points} points`
+						`🎉 LEGENDARY CATCH! ${this.fishData.fishType}! +${this.fishData.points} points`,
 					);
 				} else if (
 					this.fishData.fishType === "tuna" ||
@@ -760,11 +784,11 @@ export default class Minigame extends Phaser.Scene {
 					this.fishData.fishType === "anglerfish"
 				) {
 					console.log(
-						`⭐ RARE CATCH! ${this.fishData.fishType}! +${this.fishData.points} points`
+						`⭐ RARE CATCH! ${this.fishData.fishType}! +${this.fishData.points} points`,
 					);
 				} else {
 					console.log(
-						`Caught ${this.fishData.fishType}! +${this.fishData.points} points`
+						`Caught ${this.fishData.fishType}! +${this.fishData.points} points`,
 					);
 				}
 			} else {
@@ -776,6 +800,200 @@ export default class Minigame extends Phaser.Scene {
 			this.scene.resume("DockScene");
 
 			// Update dock scene score
+			const dockScene = this.scene.get("DockScene");
+			if (dockScene) {
+				dockScene.score = updatedScore;
+				dockScene.registry.set("currentScore", updatedScore);
+				if (dockScene.scoreText) {
+					dockScene.scoreText.setText("Score: " + updatedScore);
+				}
+				// Resume bobber return
+				if (dockScene.bobber) {
+					dockScene.bobber.isReturning = true;
+				}
+			}
+		});
+	}
+
+	showBottleMessage() {
+		const { width, height } = this.cameras.main;
+
+		// Clear previous overlay
+		this.children.removeAll();
+
+		// Create darker overlay
+		const overlay = this.add
+			.rectangle(0, 0, width, height, 0x000000, 0.85)
+			.setOrigin(0, 0);
+
+		// Create message box
+		const boxWidth = 280;
+		const boxHeight = 140;
+		const messageBox = this.add
+			.rectangle(width / 2, height / 2, boxWidth, boxHeight, 0x8b4513)
+			.setStrokeStyle(4, 0x654321);
+
+		// Title
+		const titleText = this.add
+			.text(width / 2, height / 2 - 45, "🍾 Mysterious Bottle", {
+				fontSize: "18px",
+				fill: "#ffff00",
+				fontFamily: "Arial",
+				fontStyle: "bold",
+			})
+			.setOrigin(0.5);
+
+		// Message text
+		const messageText = this.add
+			.text(
+				width / 2,
+				height / 2,
+				"There was a message here,\nbut it's too faded to read...",
+				{
+					fontSize: "14px",
+					fill: "#ffffff",
+					fontFamily: "Arial",
+					align: "center",
+					lineSpacing: 5,
+				},
+			)
+			.setOrigin(0.5);
+
+		// Continue prompt
+		const continueText = this.add
+			.text(width / 2, height / 2 + 50, "Click to continue", {
+				fontSize: "12px",
+				fill: "#aaaaaa",
+				fontFamily: "Arial",
+			})
+			.setOrigin(0.5);
+
+		// Return to dock on next click
+		this.input.once("pointerdown", () => {
+			const updatedScore = this.currentScore + this.fishData.points;
+
+			console.log(
+				`🍾 MYSTERIOUS BOTTLE! There was a message, but it's too faded to read...`,
+			);
+
+			// Stop minigame scene and resume dock scene
+			this.scene.stop();
+			this.scene.resume("DockScene");
+
+			// Pass score to dock scene
+			const dockScene = this.scene.get("DockScene");
+			if (dockScene) {
+				dockScene.score = updatedScore;
+				dockScene.registry.set("currentScore", updatedScore);
+				if (dockScene.scoreText) {
+					dockScene.scoreText.setText("Score: " + updatedScore);
+				}
+				// Resume bobber return
+				if (dockScene.bobber) {
+					dockScene.bobber.isReturning = true;
+				}
+			}
+		});
+	}
+
+	showGarMessage() {
+		const { width, height } = this.cameras.main;
+
+		// Check if there was a last fish caught
+		const lastFish = this.registry.get("lastFishCaught");
+
+		// Clear previous overlay
+		this.children.removeAll();
+
+		// Create darker overlay
+		const overlay = this.add
+			.rectangle(0, 0, width, height, 0x000000, 0.85)
+			.setOrigin(0, 0);
+
+		// Create message box
+		const boxWidth = 280;
+		const boxHeight = 160;
+		const messageBox = this.add
+			.rectangle(width / 2, height / 2, boxWidth, boxHeight, 0x8b0000)
+			.setStrokeStyle(4, 0xff0000);
+
+		// Title
+		const titleText = this.add
+			.text(width / 2, height / 2 - 55, "⚠️ EVIL GAR!", {
+				fontSize: "20px",
+				fill: "#ff0000",
+				fontFamily: "Arial",
+				fontStyle: "bold",
+			})
+			.setOrigin(0.5);
+
+		// Message text
+		let messageText;
+		let scoreChange = this.fishData.points;
+
+		if (lastFish) {
+			messageText = this.add
+				.text(
+					width / 2,
+					height / 2 - 5,
+					`The gar stole your ${lastFish.fishType}!\n\nYou gained ${this.fishData.points} points\nbut lost ${lastFish.points} points!`,
+					{
+						fontSize: "13px",
+						fill: "#ffffff",
+						fontFamily: "Arial",
+						align: "center",
+						lineSpacing: 5,
+					},
+				)
+				.setOrigin(0.5);
+			scoreChange = this.fishData.points - lastFish.points;
+			// Clear last fish since gar stole it
+			this.registry.set("lastFishCaught", null);
+		} else {
+			messageText = this.add
+				.text(
+					width / 2,
+					height / 2 - 5,
+					`The gar tried to steal a fish,\nbut you had nothing!\n\n+${this.fishData.points} points`,
+					{
+						fontSize: "13px",
+						fill: "#ffffff",
+						fontFamily: "Arial",
+						align: "center",
+						lineSpacing: 5,
+					},
+				)
+				.setOrigin(0.5);
+		}
+
+		// Continue prompt
+		const continueText = this.add
+			.text(width / 2, height / 2 + 60, "Click to continue", {
+				fontSize: "12px",
+				fill: "#aaaaaa",
+				fontFamily: "Arial",
+			})
+			.setOrigin(0.5);
+
+		// Return to dock on next click
+		this.input.once("pointerdown", () => {
+			const updatedScore = this.currentScore + scoreChange;
+
+			if (lastFish) {
+				console.log(
+					`⚠️ EVIL GAR stole your ${lastFish.fishType}! +${this.fishData.points} -${lastFish.points} = ${scoreChange > 0 ? "+" : ""}${scoreChange} points`,
+				);
+			} else {
+				console.log(
+					`⚠️ EVIL GAR! But you had no fish to steal! +${this.fishData.points} points`,
+				);
+			}
+
+			// Stop minigame scene and resume dock scene
+			this.scene.stop();
+			this.scene.resume("DockScene");
+
+			// Pass score to dock scene
 			const dockScene = this.scene.get("DockScene");
 			if (dockScene) {
 				dockScene.score = updatedScore;
