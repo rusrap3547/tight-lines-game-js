@@ -386,9 +386,7 @@ export default class dockScene extends Phaser.Scene {
 				else if (this.bobber.cast()) {
 					// Cast was successful, play fish animation
 					this.player.playAnimation("fish");
-					// Increment cast counter
-					this.castCount++;
-					this.updateDayCycle();
+					// Cast count will be incremented after minigame completes
 				}
 			}
 		});
@@ -470,13 +468,14 @@ export default class dockScene extends Phaser.Scene {
 
 		// Market button (top-right corner)
 		const marketButton = this.add
-			.rectangle(width - 40, 20, 70, 25, 0xffd700)
+			.rectangle(width - 45, 20, 75, 30, 0x2c5f2d, 1)
+			.setStrokeStyle(3, 0xffffff)
 			.setInteractive({ useHandCursor: true });
 
 		const marketButtonText = this.add
-			.text(width - 40, 20, "MARKET", {
+			.text(width - 45, 20, "MARKET", {
 				fontSize: "11px",
-				fill: "#000",
+				fill: "#FFFFFF",
 				fontFamily: "Arial",
 				fontStyle: "bold",
 			})
@@ -488,11 +487,23 @@ export default class dockScene extends Phaser.Scene {
 		});
 
 		marketButton.on("pointerover", () => {
-			marketButton.setFillStyle(0xffff00);
+			marketButton.setFillStyle(0x3d7f3e);
+			this.tweens.add({
+				targets: [marketButton, marketButtonText],
+				scaleX: 1.05,
+				scaleY: 1.05,
+				duration: 100,
+			});
 		});
 
 		marketButton.on("pointerout", () => {
-			marketButton.setFillStyle(0xffd700);
+			marketButton.setFillStyle(0x2c5f2d);
+			this.tweens.add({
+				targets: [marketButton, marketButtonText],
+				scaleX: 1.0,
+				scaleY: 1.0,
+				duration: 100,
+			});
 		});
 
 		// Placeholder for mini-game UI (will be created when needed)
@@ -1087,7 +1098,8 @@ export default class dockScene extends Phaser.Scene {
 			this.dayCatches = [];
 			this.dayStartScore = this.score;
 
-			// Go to market scene
+			// Stop dock scene and go to market scene
+			this.scene.stop();
 			this.scene.start("MarketScene", { score: this.score });
 		});
 	}

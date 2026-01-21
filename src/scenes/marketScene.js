@@ -173,30 +173,25 @@ export default class marketScene extends Phaser.Scene {
 		const spacingTotal = totalAvailableWidth - stallSize * 4;
 		const shopSpacing = spacingTotal / 3;
 
-		// Center the stalls horizontally
-		const startX = (width - totalAvailableWidth) / 2;
-		// Position vertically: center stalls in dock area
-		const dockStartY = height * 0.5;
-		const shopY = dockStartY + (dockHeight - stallSize) / 2;
+		// ============================================
+		// SHOP BUTTONS (under the stalls)
+		// ============================================
+		const buttonY = dockStartY + dockHeight - 30;
+		const buttonWidth = 70;
+		const buttonHeight = 25;
+
+		// Calculate stall Y position to be exactly 5px above buttons
+		// Button top edge is at buttonY - buttonHeight/2
+		// Stall bottom edge should be 5px above that
+		const shopY = buttonY - buttonHeight / 2 - 5 - stallSize;
 
 		// Bait Shop
-		this.createShop(
-			startX,
-			shopY,
-			"BAIT\nSHOP",
-			MARKET_CONFIG.BAIT_SHOP_COLOR,
-			"bait",
-			selectedFrames[0],
-			stallSize,
-		);
+		this.createShop(startX, shopY, selectedFrames[0], stallSize);
 
 		// Line Shop
 		this.createShop(
 			startX + stallSize + shopSpacing,
 			shopY,
-			"LINE\nSHOP",
-			MARKET_CONFIG.LINE_SHOP_COLOR,
-			"line",
 			selectedFrames[1],
 			stallSize,
 		);
@@ -205,9 +200,6 @@ export default class marketScene extends Phaser.Scene {
 		this.createShop(
 			startX + (stallSize + shopSpacing) * 2,
 			shopY,
-			"ROD\nSHOP",
-			MARKET_CONFIG.ROD_SHOP_COLOR,
-			"rod",
 			selectedFrames[2],
 			stallSize,
 		);
@@ -216,55 +208,100 @@ export default class marketScene extends Phaser.Scene {
 		this.createShop(
 			startX + (stallSize + shopSpacing) * 3,
 			shopY,
-			"FISH\nBUYER",
-			MARKET_CONFIG.BUYER_SHOP_COLOR,
-			"buyer",
 			selectedFrames[3],
 			stallSize,
 		);
 
+		// Calculate button positions to align under stalls
+		const button1X = startX + stallSize / 2;
+		const button2X = startX + stallSize + shopSpacing + stallSize / 2;
+		const button3X = startX + (stallSize + shopSpacing) * 2 + stallSize / 2;
+		const button4X = startX + (stallSize + shopSpacing) * 3 + stallSize / 2;
+
+		// Bait Shop Button
+		this.createShopButton(
+			button1X,
+			buttonY,
+			buttonWidth,
+			buttonHeight,
+			"BAIT SHOP",
+			"bait",
+		);
+
+		// Line Shop Button
+		this.createShopButton(
+			button2X,
+			buttonY,
+			buttonWidth,
+			buttonHeight,
+			"LINE SHOP",
+			"line",
+		);
+
+		// Rod Shop Button
+		this.createShopButton(
+			button3X,
+			buttonY,
+			buttonWidth,
+			buttonHeight,
+			"ROD SHOP",
+			"rod",
+		);
+
+		// Fish Buyer Button
+		this.createShopButton(
+			button4X,
+			buttonY,
+			buttonWidth,
+			buttonHeight,
+			"FISH BUYER",
+			"buyer",
+		);
+
 		// ============================================
-		// BACK ARROW TO DOCK
+		// BACK BUTTON TO DOCK
 		// ============================================
-		const arrow = this.add
-			.triangle(
-				MARKET_CONFIG.ARROW_X,
-				height / 2,
-				0,
-				0,
-				MARKET_CONFIG.ARROW_SIZE,
-				MARKET_CONFIG.ARROW_SIZE / 2,
-				MARKET_CONFIG.ARROW_SIZE,
-				-MARKET_CONFIG.ARROW_SIZE / 2,
-				MARKET_CONFIG.ARROW_COLOR,
-			)
+		const dockButton = this.add
+			.rectangle(60, height / 2, 100, 30, 0x2c5f2d, 1)
+			.setStrokeStyle(3, 0xffffff)
 			.setInteractive({ useHandCursor: true });
 
-		arrow.on("pointerdown", () => {
+		const dockButtonText = this.add
+			.text(60, height / 2, "BACK TO DOCK", {
+				fontSize: "10px",
+				fill: "#FFFFFF",
+				fontFamily: "Arial",
+				fontStyle: "bold",
+			})
+			.setOrigin(0.5);
+
+		dockButton.on("pointerdown", () => {
 			this.scene.start("DockScene");
 		});
 
-		// Arrow hover effect
-		arrow.on("pointerover", () => {
-			arrow.setFillStyle(0x00ff00);
-		});
-		arrow.on("pointerout", () => {
-			arrow.setFillStyle(MARKET_CONFIG.ARROW_COLOR);
+		// Button hover effect
+		dockButton.on("pointerover", () => {
+			dockButton.setFillStyle(0x3d7f3e);
+			this.tweens.add({
+				targets: [dockButton, dockButtonText],
+				scaleX: 1.05,
+				scaleY: 1.05,
+				duration: 100,
+			});
 		});
 
-		// Arrow label
-		this.add
-			.text(MARKET_CONFIG.ARROW_X + 25, height / 2, "Back to Dock", {
-				fontSize: "10px",
-				fill: "#fff",
-				fontFamily: "Arial",
-				stroke: "#000",
-				strokeThickness: 2,
-			})
-			.setOrigin(0, 0.5);
+		dockButton.on("pointerout", () => {
+			dockButton.setFillStyle(0x2c5f2d);
+			this.tweens.add({
+				targets: [dockButton, dockButtonText],
+				scaleX: 1.0,
+				scaleY: 1.0,
+				duration: 100,
+			});
+		});
 	}
 
-	createShop(x, y, label, color, shopType, frameIndex, stallSize) {
+	createShop(x, y, frameIndex, stallSize) {
 		// Create a sprite and set the specific frame
 		const shop = this.add.sprite(
 			x + stallSize / 2,
@@ -275,34 +312,50 @@ export default class marketScene extends Phaser.Scene {
 		// Set the frame name - spritesheet frames are indexed starting from __BASE for frame 0
 		shop.setFrame(frameIndex);
 		shop.setDisplaySize(stallSize, stallSize); // Use setDisplaySize instead of setScale
-		shop.setInteractive({ useHandCursor: true });
 		shop.setDepth(0);
+	}
 
-		// Shop label
-		this.add
-			.text(x + stallSize / 2, y + stallSize / 2, label, {
-				fontSize: "10px",
-				fill: "#fff",
+	createShopButton(x, y, width, height, label, shopType) {
+		// Button background
+		const buttonBg = this.add
+			.rectangle(x, y, width, height, 0x2c5f2d, 1)
+			.setStrokeStyle(2, 0xffffff)
+			.setInteractive({ useHandCursor: true });
+
+		// Button text
+		const buttonText = this.add
+			.text(x, y, label, {
+				fontSize: "8px",
+				fill: "#FFFFFF",
 				fontFamily: "Arial",
 				fontStyle: "bold",
-				align: "center",
-				stroke: "#000",
-				strokeThickness: 3,
 			})
-			.setOrigin(0.5, 0.5)
-			.setDepth(1);
+			.setOrigin(0.5);
 
 		// Click handler
-		shop.on("pointerdown", () => {
+		buttonBg.on("pointerdown", () => {
 			this.openShop(shopType);
 		});
 
-		// Hover effect (tint)
-		shop.on("pointerover", () => {
-			shop.setTint(0xcccccc);
+		// Hover effects
+		buttonBg.on("pointerover", () => {
+			buttonBg.setFillStyle(0x3d7f3e);
+			this.tweens.add({
+				targets: [buttonBg, buttonText],
+				scaleX: 1.05,
+				scaleY: 1.05,
+				duration: 100,
+			});
 		});
-		shop.on("pointerout", () => {
-			shop.clearTint();
+
+		buttonBg.on("pointerout", () => {
+			buttonBg.setFillStyle(0x2c5f2d);
+			this.tweens.add({
+				targets: [buttonBg, buttonText],
+				scaleX: 1.0,
+				scaleY: 1.0,
+				duration: 100,
+			});
 		});
 	}
 

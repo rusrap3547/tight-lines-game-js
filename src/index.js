@@ -1,5 +1,7 @@
 import Phaser, { Scale } from "phaser";
 import startScene from "./scenes/startScene.js";
+import tutorialScene from "./scenes/tutorialScene.js";
+import encyclopediaScene from "./scenes/encyclopediaScene.js";
 import dockScene from "./scenes/dockScene.js";
 import marketScene from "./scenes/marketScene.js";
 import Minigame from "./scenes/minigame.js";
@@ -18,7 +20,14 @@ const config = {
 			debug: false,
 		},
 	},
-	scene: [startScene, marketScene, dockScene, Minigame],
+	scene: [
+		startScene,
+		tutorialScene,
+		encyclopediaScene,
+		marketScene,
+		dockScene,
+		Minigame,
+	],
 	scale: {
 		mode: Phaser.Scale.FIT,
 		autoCenter: Phaser.Scale.CENTER_BOTH,
