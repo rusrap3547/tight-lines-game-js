@@ -482,7 +482,9 @@ export default class dockScene extends Phaser.Scene {
 			.setOrigin(0.5, 0.5);
 
 		marketButton.on("pointerdown", () => {
-			// Pass current score to market scene
+			console.log("🛒 Market button clicked! Score:", this.score);
+			// Stop dock scene and pass current score to market scene
+			this.scene.stop();
 			this.scene.start("MarketScene", { score: this.score });
 		});
 
@@ -963,11 +965,14 @@ export default class dockScene extends Phaser.Scene {
 	showDayStats() {
 		const { width, height } = this.cameras.main;
 
+		console.log("📊 Showing day stats...");
+
 		// Create full screen overlay
 		const overlay = this.add
 			.rectangle(0, 0, width, height, 0x000000, 0.85)
 			.setOrigin(0, 0)
-			.setDepth(200);
+			.setDepth(200)
+			.setInteractive(); // Make overlay interactive to block clicks underneath
 
 		// Create stats box
 		const boxWidth = 320;
@@ -1083,6 +1088,8 @@ export default class dockScene extends Phaser.Scene {
 
 		// OK button click - go to market
 		okButton.on("pointerdown", () => {
+			console.log("📊 OK button clicked! Going to market...");
+
 			// Clean up stats UI
 			overlay.destroy();
 			statsBox.destroy();
@@ -1097,6 +1104,8 @@ export default class dockScene extends Phaser.Scene {
 			// Reset day catches for next day
 			this.dayCatches = [];
 			this.dayStartScore = this.score;
+
+			console.log("🛒 Starting MarketScene with score:", this.score);
 
 			// Stop dock scene and go to market scene
 			this.scene.stop();

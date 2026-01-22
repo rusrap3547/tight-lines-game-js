@@ -67,6 +67,7 @@ export default class marketScene extends Phaser.Scene {
 	init(data) {
 		// Receive score from dock scene
 		this.fishScore = data.score || 0;
+		console.log("🛒 MarketScene init - received score:", this.fishScore);
 	}
 
 	preload() {
@@ -83,6 +84,8 @@ export default class marketScene extends Phaser.Scene {
 
 	create() {
 		const { width, height } = this.cameras.main;
+
+		console.log("🛒 MarketScene create - starting to build scene");
 
 		// Initialize or retrieve player data from registry
 		if (!this.registry.has("playerMoney")) {
@@ -172,6 +175,11 @@ export default class marketScene extends Phaser.Scene {
 		// Distribute remaining space after stalls as spacing
 		const spacingTotal = totalAvailableWidth - stallSize * 4;
 		const shopSpacing = spacingTotal / 3;
+
+		// Center the stalls horizontally
+		const startX = (width - totalAvailableWidth) / 2;
+		// Position vertically: dock starts at 50% of screen height
+		const dockStartY = height * 0.5;
 
 		// ============================================
 		// SHOP BUTTONS (under the stalls)
@@ -276,7 +284,11 @@ export default class marketScene extends Phaser.Scene {
 			.setOrigin(0.5);
 
 		dockButton.on("pointerdown", () => {
-			this.scene.start("DockScene");
+			console.log("🏠 Back to Dock button clicked!");
+			// Stop market scene and pass score back to dock scene
+			const currentScore = this.registry.get("currentScore") || 0;
+			this.scene.stop();
+			this.scene.start("DockScene", { score: currentScore });
 		});
 
 		// Button hover effect
