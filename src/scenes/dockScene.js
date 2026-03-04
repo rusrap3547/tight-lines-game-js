@@ -89,6 +89,10 @@ export default class dockScene extends Phaser.Scene {
 		this.castCount = 0;
 		this.currentDay = 1;
 		this.timeOfDay = "morning";
+
+		// Track catches and points for the day
+		this.dayCatches = [];
+		this.dayStartScore = 0;
 	}
 
 	init(data) {
@@ -97,6 +101,10 @@ export default class dockScene extends Phaser.Scene {
 			this.score = data.score;
 			this.registry.set("currentScore", this.score);
 		}
+
+		// Store day start score to calculate day points
+		this.dayStartScore = this.score || 0;
+		this.dayCatches = [];
 	}
 
 	preload() {
@@ -378,9 +386,7 @@ export default class dockScene extends Phaser.Scene {
 				else if (this.bobber.cast()) {
 					// Cast was successful, play fish animation
 					this.player.playAnimation("fish");
-					// Increment cast counter
-					this.castCount++;
-					this.updateDayCycle();
+					// Cast count will be incremented after minigame completes
 				}
 			}
 		});
@@ -462,29 +468,44 @@ export default class dockScene extends Phaser.Scene {
 
 		// Market button (top-right corner)
 		const marketButton = this.add
-			.rectangle(width - 40, 20, 70, 25, 0xffd700)
+			.rectangle(width - 45, 20, 75, 30, 0x2c5f2d, 1)
+			.setStrokeStyle(3, 0xffffff)
 			.setInteractive({ useHandCursor: true });
 
 		const marketButtonText = this.add
-			.text(width - 40, 20, "MARKET", {
+			.text(width - 45, 20, "MARKET", {
 				fontSize: "11px",
-				fill: "#000",
+				fill: "#FFFFFF",
 				fontFamily: "Arial",
 				fontStyle: "bold",
 			})
 			.setOrigin(0.5, 0.5);
 
 		marketButton.on("pointerdown", () => {
-			// Pass current score to market scene
+			console.log("🛒 Market button clicked! Score:", this.score);
+			// Stop dock scene and pass current score to market scene
+			this.scene.stop();
 			this.scene.start("MarketScene", { score: this.score });
 		});
 
 		marketButton.on("pointerover", () => {
-			marketButton.setFillStyle(0xffff00);
+			marketButton.setFillStyle(0x3d7f3e);
+			this.tweens.add({
+				targets: [marketButton, marketButtonText],
+				scaleX: 1.05,
+				scaleY: 1.05,
+				duration: 100,
+			});
 		});
 
 		marketButton.on("pointerout", () => {
-			marketButton.setFillStyle(0xffd700);
+			marketButton.setFillStyle(0x2c5f2d);
+			this.tweens.add({
+				targets: [marketButton, marketButtonText],
+				scaleX: 1.0,
+				scaleY: 1.0,
+				duration: 100,
+			});
 		});
 
 		// Placeholder for mini-game UI (will be created when needed)
@@ -750,19 +771,21 @@ export default class dockScene extends Phaser.Scene {
 		}
 
 		// Update sky color based on time of day
-		const newColor = DAY_CYCLE_CONFIG.SKY_COLORS[this.timeOfDay];
-		this.skyRectangle.setFillStyle(newColor);
+		// Note: Currently using pre-rendered sky images, so can't change color dynamically
+		// If you want dynamic sky colors, replace layer_sky image with a colored rectangle
+		// const newColor = DAY_CYCLE_CONFIG.SKY_COLORS[this.timeOfDay];
+		// this.skyRectangle.setFillStyle(newColor);
 
 		// Update day text display
 		const timeOfDayCapitalized =
 			this.timeOfDay.charAt(0).toUpperCase() + this.timeOfDay.slice(1);
 		this.dayText.setText(`Day ${this.currentDay} - ${timeOfDayCapitalized}`);
 
-		// Check if day is complete (reached 15 casts)
+		// Check if day is complete (just finished 15th cast)
 		if (castsInDay === 0 && this.castCount > 0) {
-			console.log(`🌅 Day ${this.currentDay} begins!`);
-			// Go to market scene to start new day
-			this.scene.start("MarketScene", { score: this.score });
+			console.log(`🌅 Day ${this.currentDay - 1} complete!`);
+			// Show end-of-day stats before going to market
+			this.showDayStats();
 		}
 	}
 
@@ -942,5 +965,160 @@ export default class dockScene extends Phaser.Scene {
 		// Reset minigame state
 		this.miniGameActive = false;
 		this.currentFishCaught = null;
+	}
+
+	// ============================================
+	// END OF DAY STATS SCREEN
+	// ============================================
+
+	showDayStats() {
+		const { width, height } = this.cameras.main;
+
+		console.log("📊 Showing day stats...");
+
+		// Create full screen overlay
+		const overlay = this.add
+			.rectangle(0, 0, width, height, 0x000000, 0.85)
+			.setOrigin(0, 0)
+			.setDepth(200)
+			.setInteractive(); // Make overlay interactive to block clicks underneath
+
+		// Create stats box
+		const boxWidth = 320;
+		const boxHeight = 280;
+		const boxX = width / 2;
+		const boxY = height / 2;
+
+		const statsBox = this.add
+			.rectangle(boxX, boxY, boxWidth, boxHeight, 0x2c3e50)
+			.setStrokeStyle(4, 0x3498db)
+			.setDepth(201);
+
+		// Title
+		const titleText = this.add
+			.text(boxX, boxY - 115, `Day ${this.currentDay - 1} Complete!`, {
+				fontSize: "22px",
+				fill: "#ffff00",
+				fontFamily: "Arial",
+				fontStyle: "bold",
+			})
+			.setOrigin(0.5)
+			.setDepth(202);
+
+		// Divider line
+		const divider = this.add
+			.rectangle(boxX, boxY - 90, boxWidth - 20, 2, 0x3498db)
+			.setDepth(202);
+
+		// Calculate total points earned this day
+		const dayPoints = this.score - this.dayStartScore;
+
+		// Fish caught header
+		const catchHeader = this.add
+			.text(boxX, boxY - 70, "Fish Caught:", {
+				fontSize: "16px",
+				fill: "#ffffff",
+				fontFamily: "Arial",
+				fontStyle: "bold",
+			})
+			.setOrigin(0.5)
+			.setDepth(202);
+
+		// Display caught fish (up to 6, then show "and X more...")
+		let catchListText = "";
+		const maxDisplay = 6;
+
+		if (this.dayCatches.length === 0) {
+			catchListText = "No fish caught today!";
+		} else {
+			const displayCatches = this.dayCatches.slice(0, maxDisplay);
+			catchListText = displayCatches
+				.map((fish) => `${fish.fishType} (+${fish.points})`)
+				.join("\n");
+
+			if (this.dayCatches.length > maxDisplay) {
+				const remaining = this.dayCatches.length - maxDisplay;
+				catchListText += `\nand ${remaining} more...`;
+			}
+		}
+
+		const catchList = this.add
+			.text(boxX, boxY - 15, catchListText, {
+				fontSize: "12px",
+				fill: "#ffffff",
+				fontFamily: "Arial",
+				align: "center",
+				lineSpacing: 3,
+			})
+			.setOrigin(0.5)
+			.setDepth(202);
+
+		// Total points
+		const totalText = this.add
+			.text(boxX, boxY + 75, `Total Points: +${dayPoints}`, {
+				fontSize: "18px",
+				fill: "#00ff00",
+				fontFamily: "Arial",
+				fontStyle: "bold",
+			})
+			.setOrigin(0.5)
+			.setDepth(202);
+
+		// OK button
+		const buttonWidth = 100;
+		const buttonHeight = 35;
+		const buttonY = boxY + 110;
+
+		const okButton = this.add
+			.rectangle(boxX, buttonY, buttonWidth, buttonHeight, 0x4caf50)
+			.setStrokeStyle(2, 0xffffff)
+			.setOrigin(0.5)
+			.setDepth(202)
+			.setInteractive({ useHandCursor: true });
+
+		const okButtonText = this.add
+			.text(boxX, buttonY, "OK", {
+				fontSize: "16px",
+				fill: "#ffffff",
+				fontFamily: "Arial",
+				fontStyle: "bold",
+			})
+			.setOrigin(0.5)
+			.setDepth(203);
+
+		// Button hover effects
+		okButton.on("pointerover", () => {
+			okButton.setFillStyle(0x66bb6a);
+		});
+
+		okButton.on("pointerout", () => {
+			okButton.setFillStyle(0x4caf50);
+		});
+
+		// OK button click - go to market
+		okButton.on("pointerdown", () => {
+			console.log("📊 OK button clicked! Going to market...");
+
+			// Clean up stats UI
+			overlay.destroy();
+			statsBox.destroy();
+			titleText.destroy();
+			divider.destroy();
+			catchHeader.destroy();
+			catchList.destroy();
+			totalText.destroy();
+			okButton.destroy();
+			okButtonText.destroy();
+
+			// Reset day catches for next day
+			this.dayCatches = [];
+			this.dayStartScore = this.score;
+
+			console.log("🛒 Starting MarketScene with score:", this.score);
+
+			// Stop dock scene and go to market scene
+			this.scene.stop();
+			this.scene.start("MarketScene", { score: this.score });
+		});
 	}
 }

@@ -798,6 +798,15 @@ export default class Minigame extends Phaser.Scene {
 						`Caught ${this.fishData.fishType}! +${this.fishData.points} points`,
 					);
 				}
+
+				// Add to day catches for end-of-day stats
+				const dockScene = this.scene.get("DockScene");
+				if (dockScene && dockScene.dayCatches) {
+					dockScene.dayCatches.push({
+						fishType: this.fishData.fishType,
+						points: this.fishData.points,
+					});
+				}
 			} else {
 				console.log(`❌ ${this.fishData.fishType} got away!`);
 			}
@@ -806,7 +815,7 @@ export default class Minigame extends Phaser.Scene {
 			this.scene.stop();
 			this.scene.resume("DockScene");
 
-			// Update dock scene score
+			// Update dock scene score and cast count
 			const dockScene = this.scene.get("DockScene");
 			if (dockScene) {
 				dockScene.score = updatedScore;
@@ -814,6 +823,9 @@ export default class Minigame extends Phaser.Scene {
 				if (dockScene.scoreText) {
 					dockScene.scoreText.setText("Score: " + updatedScore);
 				}
+				// Increment cast counter after minigame completes
+				dockScene.castCount++;
+				dockScene.updateDayCycle();
 				// Resume bobber return
 				if (dockScene.bobber) {
 					dockScene.bobber.isReturning = true;
