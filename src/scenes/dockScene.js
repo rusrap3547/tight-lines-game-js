@@ -492,6 +492,10 @@ export default class dockScene extends Phaser.Scene {
 	}
 
 	getWeightedRandomFishType() {
+		// Get Bait upgrade level (increases rare fish chance by 5% per level)
+		const baitLevel = this.registry.get("baitLevel") || 0;
+		const baitBonus = baitLevel * 0.05; // 5% per level
+
 		// Roll for super rare Bottle first (0.03% chance = ~1 per hour at 2 spawns/sec)
 		const bottleRoll = Math.random();
 		if (bottleRoll < 0.0003) {
@@ -500,8 +504,13 @@ export default class dockScene extends Phaser.Scene {
 		}
 
 		// Roll for regular trash (but exclude Bottle from regular trash pool)
+		// Reduce trash chance with better bait
 		const trashRoll = Math.random();
-		if (trashRoll < GAME_CONFIG.TRASH_SPAWN_CHANCE) {
+		const effectiveTrashChance = Math.max(
+			0.02,
+			GAME_CONFIG.TRASH_SPAWN_CHANCE - baitBonus,
+		);
+		if (trashRoll < effectiveTrashChance) {
 			// Spawn trash (without Bottle)
 			const trashTypes = ["RustyCan", "AppleCore", "Seaweed"];
 			return { type: Phaser.Math.RND.pick(trashTypes), isTrash: true };
@@ -513,16 +522,16 @@ export default class dockScene extends Phaser.Scene {
 			return { type: "Gar", isTrash: false, isHazard: true };
 		}
 
-		// Roll for legendary fish (2% chance)
+		// Roll for legendary fish (2% base chance + bait bonus)
 		const legendaryRoll = Math.random();
-		if (legendaryRoll < 0.02) {
+		if (legendaryRoll < 0.02 + baitBonus) {
 			const legendaryFish = ["Arowana", "GreatWhiteShark"];
 			return { type: Phaser.Math.RND.pick(legendaryFish), isTrash: false };
 		}
 
-		// Roll for rare fish (8% chance)
+		// Roll for rare fish (8% base chance + bait bonus)
 		const rareRoll = Math.random();
-		if (rareRoll < 0.08) {
+		if (rareRoll < 0.08 + baitBonus) {
 			const rareFish = ["Tuna", "Stingray", "Anglerfish"];
 			return { type: Phaser.Math.RND.pick(rareFish), isTrash: false };
 		}

@@ -205,8 +205,14 @@ export default class Minigame extends Phaser.Scene {
 			const arrow = this.fallingArrows[i];
 
 			if (!arrow.hit && !arrow.missed) {
-				// Move arrow down
-				arrow.y += MINIGAME_CONFIG.ARROW_SPEED * (delta / 1000);
+				// Move arrow down - Apply Rod upgrade (reduces speed making it easier)
+				const rodLevel = this.registry.get("rodLevel") || 0;
+				const speedReduction = rodLevel * 15; // 15 pixels/sec slower per rod level
+				const effectiveSpeed = Math.max(
+					100,
+					MINIGAME_CONFIG.ARROW_SPEED - speedReduction,
+				);
+				arrow.y += effectiveSpeed * (delta / 1000);
 				arrow.sprite.y = arrow.y;
 
 				// Check if arrow passed the hit zone (missed)
@@ -539,8 +545,9 @@ export default class Minigame extends Phaser.Scene {
 			this.lanePositions.push(laneStartX + i * MINIGAME_CONFIG.LANE_SPACING);
 		}
 
-		// Timer display
-		this.timeRemaining = MINIGAME_CONFIG.INITIAL_TIME;
+		// Timer display - Apply Line upgrade (base 7 seconds + 2 seconds per level)
+		const lineLevel = this.registry.get("lineLevel") || 0;
+		this.timeRemaining = MINIGAME_CONFIG.INITIAL_TIME + lineLevel * 2;
 		this.timerText = this.add.text(
 			rightHalfStart + 13,
 			13,

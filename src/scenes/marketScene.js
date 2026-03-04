@@ -454,40 +454,112 @@ export default class marketScene extends Phaser.Scene {
 				});
 			}
 		} else {
-			// Other shops - Coming Soon
-			infoText = this.add
-				.text(
-					width / 2,
-					height / 2 - 10,
-					`Upgrades coming soon!\n\nThis shop will offer\n${
-						shopTitle === "Bait Shop"
-							? "better bait"
-							: shopTitle === "Line Shop"
-								? "stronger lines"
-								: "upgraded rods"
-					}\nto improve your fishing.`,
-					{
+			// Upgrade shops - Show upgrade info
+			if (currentLevel >= maxLevel) {
+				// Max level reached
+				infoText = this.add
+					.text(
+						width / 2,
+						height / 2 - 10,
+						`${upgradeName}\n\nLevel: ${currentLevel}/${maxLevel}\nCurrent: ${currentValue}${valueUnit}\n\n✓ MAX LEVEL REACHED!`,
+						{
+							fontSize: "10px",
+							fill: "#000",
+							fontFamily: "Arial",
+							align: "center",
+						},
+					)
+					.setOrigin(0.5, 0.5);
+
+				// Max level button (disabled)
+				buyButton = this.add
+					.rectangle(width / 2, height / 2 + 25, 100, 20, 0x888888)
+					.setOrigin(0.5, 0.5);
+
+				buyButtonText = this.add
+					.text(width / 2, height / 2 + 25, "MAX LEVEL", {
 						fontSize: "10px",
-						fill: "#000",
+						fill: "#fff",
 						fontFamily: "Arial",
-						align: "center",
-					},
-				)
-				.setOrigin(0.5, 0.5);
+						fontStyle: "bold",
+					})
+					.setOrigin(0.5, 0.5);
+			} else {
+				// Show upgrade info
+				infoText = this.add
+					.text(
+						width / 2,
+						height / 2 - 10,
+						`${upgradeName}\n\nLevel: ${currentLevel}/${maxLevel}\nCurrent: ${currentValue}${valueUnit}\nNext: ${nextValue}${valueUnit}\n\nCost: ${cost} gold`,
+						{
+							fontSize: "10px",
+							fill: "#000",
+							fontFamily: "Arial",
+							align: "center",
+						},
+					)
+					.setOrigin(0.5, 0.5);
 
-			// Coming Soon button
-			buyButton = this.add
-				.rectangle(width / 2, height / 2 + 25, 100, 20, 0x888888)
-				.setOrigin(0.5, 0.5);
+				// Check if player can afford
+				const currentMoney = this.registry.get("playerMoney");
+				const canAfford = currentMoney >= cost;
 
-			buyButtonText = this.add
-				.text(width / 2, height / 2 + 25, "COMING SOON", {
-					fontSize: "10px",
-					fill: "#fff",
-					fontFamily: "Arial",
-					fontStyle: "bold",
-				})
-				.setOrigin(0.5, 0.5);
+				// Buy button
+				buyButton = this.add
+					.rectangle(
+						width / 2,
+						height / 2 + 25,
+						100,
+						20,
+						canAfford ? 0x00ff00 : 0x888888,
+					)
+					.setOrigin(0.5, 0.5)
+					.setInteractive({ useHandCursor: canAfford });
+
+				buyButtonText = this.add
+					.text(
+						width / 2,
+						height / 2 + 25,
+						canAfford ? "UPGRADE" : "NOT ENOUGH GOLD",
+						{
+							fontSize: "9px",
+							fill: canAfford ? "#000" : "#fff",
+							fontFamily: "Arial",
+							fontStyle: "bold",
+						},
+					)
+					.setOrigin(0.5, 0.5);
+
+				// Buy handler
+				if (canAfford) {
+					buyButton.on("pointerdown", () => {
+						// Deduct money
+						this.registry.set("playerMoney", currentMoney - cost);
+						this.moneyText.setText(`Gold: ${this.registry.get("playerMoney")}`);
+
+						// Upgrade level
+						if (shopType === "line") {
+							this.registry.set("lineLevel", currentLevel + 1);
+						} else if (shopType === "bait") {
+							this.registry.set("baitLevel", currentLevel + 1);
+						} else if (shopType === "rod") {
+							this.registry.set("rodLevel", currentLevel + 1);
+						}
+
+						// Close and reopen shop to show updated values
+						overlay.destroy();
+						shopWindow.destroy();
+						shopBorder.destroy();
+						titleText.destroy();
+						infoText.destroy();
+						buyButton.destroy();
+						buyButtonText.destroy();
+						closeButton.destroy();
+						closeButtonText.destroy();
+						this.openShop(shopType);
+					});
+				}
+			}
 		}
 
 		// Close button
