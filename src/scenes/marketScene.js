@@ -31,6 +31,7 @@ const MARKET_CONFIG = {
 const UPGRADE_CONFIG = {
 	LINE: {
 		name: "Line Strength",
+		description: "Adds +2 seconds to reel time each level.",
 		startValue: 7, // seconds
 		increment: 2, // seconds per upgrade
 		maxLevel: 10,
@@ -39,6 +40,7 @@ const UPGRADE_CONFIG = {
 	},
 	BAIT: {
 		name: "Bait Quality",
+		description: "Adds +5% chance for rare and legendary fish each level.",
 		startValue: 0.01, // 1% rare fish chance
 		increment: 0.05, // 5% per upgrade
 		maxLevel: 10,
@@ -47,13 +49,21 @@ const UPGRADE_CONFIG = {
 	},
 	ROD: {
 		name: "Rod Power",
-		startValue: 0.5,
-		increment: 0.25,
-		maxValue: 3.0,
-		maxLevel: 10,
+		description:
+			"L1: small fish only, L2: medium unlocked, L3: all fish unlocked.",
+		startValue: 1,
+		increment: 1,
+		maxValue: 3,
+		maxLevel: 3,
 		baseCost: 100,
 		costMultiplier: 1.5,
 	},
+};
+
+const UPGRADE_ICONS = {
+	bait: "upgrade_icon_bait",
+	line: "upgrade_icon_line",
+	rod: "upgrade_icon_rod",
 };
 
 // ============================================
@@ -80,6 +90,20 @@ export default class marketScene extends Phaser.Scene {
 		// Load market background images
 		this.load.image("marketDock", "assets/images/Market/marketDock.png");
 		this.load.image("marketOcean", "assets/images/Market/marketOcean.png");
+
+		// Load upgrade icons for shop UI
+		this.load.image(
+			UPGRADE_ICONS.bait,
+			"assets/images/Upgrades/STORE ITEMS/wormV2.png",
+		);
+		this.load.image(
+			UPGRADE_ICONS.line,
+			"assets/images/Upgrades/STORE ITEMS/bob.png",
+		);
+		this.load.image(
+			UPGRADE_ICONS.rod,
+			"assets/images/Upgrades/STORE ITEMS/1classicRod.png",
+		);
 	}
 
 	create() {
@@ -373,6 +397,12 @@ export default class marketScene extends Phaser.Scene {
 
 	openShop(shopType) {
 		const { width, height } = this.cameras.main;
+		const isUpgradeShop = shopType !== "buyer";
+		const shopWindowWidth = isUpgradeShop ? 240 : 220;
+		const shopWindowHeight = isUpgradeShop ? 215 : 150;
+		const topY = height / 2 - shopWindowHeight / 2;
+		const closeY = topY + shopWindowHeight - 18;
+		const actionY = closeY - 24;
 
 		// Create dark overlay
 		const overlay = this.add
@@ -382,11 +412,23 @@ export default class marketScene extends Phaser.Scene {
 
 		// Create shop window
 		const shopWindow = this.add
-			.rectangle(width / 2, height / 2, 200, 120, 0xffffff)
+			.rectangle(
+				width / 2,
+				height / 2,
+				shopWindowWidth,
+				shopWindowHeight,
+				0xffffff,
+			)
 			.setOrigin(0.5, 0.5);
 
 		const shopBorder = this.add
-			.rectangle(width / 2, height / 2, 200, 120, 0x000000)
+			.rectangle(
+				width / 2,
+				height / 2,
+				shopWindowWidth,
+				shopWindowHeight,
+				0x000000,
+			)
 			.setOrigin(0.5, 0.5)
 			.setStrokeStyle(3, 0x000000);
 
@@ -398,11 +440,19 @@ export default class marketScene extends Phaser.Scene {
 		let cost = 0;
 		let maxLevel = 10;
 		let valueUnit = "";
+		let shopDescription = "";
+		let shopDescriptionColor = "#333";
+		let upgradeDescription = "";
+		let upgradeIconKey = null;
 
 		if (shopType === "line") {
 			shopTitle = "Line Shop";
+			shopDescription = "Upgrade your line for longer reel-in time.";
+			shopDescriptionColor = "#1b5e20";
 			currentLevel = this.registry.get("lineLevel");
 			upgradeName = UPGRADE_CONFIG.LINE.name;
+			upgradeDescription = UPGRADE_CONFIG.LINE.description;
+			upgradeIconKey = UPGRADE_ICONS.line;
 			currentValue =
 				UPGRADE_CONFIG.LINE.startValue +
 				currentLevel * UPGRADE_CONFIG.LINE.increment;
@@ -415,8 +465,12 @@ export default class marketScene extends Phaser.Scene {
 			valueUnit = "s";
 		} else if (shopType === "bait") {
 			shopTitle = "Bait Shop";
+			shopDescription = "Upgrade bait to attract rarer fish.";
+			shopDescriptionColor = "#7b1fa2";
 			currentLevel = this.registry.get("baitLevel");
 			upgradeName = UPGRADE_CONFIG.BAIT.name;
+			upgradeDescription = UPGRADE_CONFIG.BAIT.description;
+			upgradeIconKey = UPGRADE_ICONS.bait;
 			currentValue =
 				(UPGRADE_CONFIG.BAIT.startValue +
 					currentLevel * UPGRADE_CONFIG.BAIT.increment) *
@@ -430,8 +484,12 @@ export default class marketScene extends Phaser.Scene {
 			valueUnit = "%";
 		} else if (shopType === "rod") {
 			shopTitle = "Rod Shop";
+			shopDescription = "Upgrade rod tier to unlock bigger fish.";
+			shopDescriptionColor = "#8d6e00";
 			currentLevel = this.registry.get("rodLevel");
 			upgradeName = UPGRADE_CONFIG.ROD.name;
+			upgradeDescription = UPGRADE_CONFIG.ROD.description;
+			upgradeIconKey = UPGRADE_ICONS.rod;
 			currentValue =
 				UPGRADE_CONFIG.ROD.startValue +
 				currentLevel * UPGRADE_CONFIG.ROD.increment;
@@ -441,15 +499,17 @@ export default class marketScene extends Phaser.Scene {
 					Math.pow(UPGRADE_CONFIG.ROD.costMultiplier, currentLevel),
 			);
 			maxLevel = UPGRADE_CONFIG.ROD.maxLevel;
-			valueUnit = "x";
+			valueUnit = " tier";
 		} else if (shopType === "buyer") {
 			shopTitle = "Fish Buyer";
+			shopDescription = "Sell fish points here to earn gold.";
+			shopDescriptionColor = "#0d47a1";
 			// Fish buyer just shows info, no upgrades
 		}
 
 		// Shop title
 		const titleText = this.add
-			.text(width / 2, height / 2 - 50, shopTitle, {
+			.text(width / 2, topY + 18, shopTitle, {
 				fontSize: "16px",
 				fill: "#000",
 				fontFamily: "Arial",
@@ -457,7 +517,28 @@ export default class marketScene extends Phaser.Scene {
 			})
 			.setOrigin(0.5, 0.5);
 
-		let infoText, buyButton, buyButtonText;
+		const descriptionText = this.add
+			.text(width / 2, topY + 36, shopDescription, {
+				fontSize: "9px",
+				fill: shopDescriptionColor,
+				fontFamily: "Arial",
+				align: "center",
+				wordWrap: { width: shopWindowWidth - 20 },
+			})
+			.setOrigin(0.5, 0.5);
+
+		let infoText, buyButton, buyButtonText, upgradeIcon;
+
+		if (
+			isUpgradeShop &&
+			upgradeIconKey &&
+			this.textures.exists(upgradeIconKey)
+		) {
+			upgradeIcon = this.add
+				.image(width / 2, topY + 64, upgradeIconKey)
+				.setDisplaySize(40, 40)
+				.setOrigin(0.5);
+		}
 
 		if (shopType === "buyer") {
 			// Fish Buyer - Show current score and sell button
@@ -467,7 +548,7 @@ export default class marketScene extends Phaser.Scene {
 			infoText = this.add
 				.text(
 					width / 2,
-					height / 2 - 20,
+					height / 2,
 					`Sell fish for gold!\n\nCurrent Fish: ${currentScore} points\nValue: ${moneyValue} gold\n\n1 gold for every 10 points`,
 					{
 						fontSize: "9px",
@@ -481,12 +562,12 @@ export default class marketScene extends Phaser.Scene {
 			// Sell All Fish button
 			if (currentScore > 0) {
 				buyButton = this.add
-					.rectangle(width / 2, height / 2 + 25, 100, 20, 0x00ff00)
+					.rectangle(width / 2, actionY, 110, 20, 0x00ff00)
 					.setOrigin(0.5, 0.5)
 					.setInteractive({ useHandCursor: true });
 
 				buyButtonText = this.add
-					.text(width / 2, height / 2 + 25, "SELL ALL FISH", {
+					.text(width / 2, actionY, "SELL ALL FISH", {
 						fontSize: "10px",
 						fill: "#000",
 						fontFamily: "Arial",
@@ -514,6 +595,8 @@ export default class marketScene extends Phaser.Scene {
 						buyButtonText.destroy();
 						closeButton.destroy();
 						closeButtonText.destroy();
+						descriptionText.destroy();
+						if (upgradeIcon) upgradeIcon.destroy();
 						this.openShop(shopType);
 					}
 				});
@@ -525,24 +608,25 @@ export default class marketScene extends Phaser.Scene {
 				infoText = this.add
 					.text(
 						width / 2,
-						height / 2 - 10,
-						`${upgradeName}\n\nLevel: ${currentLevel}/${maxLevel}\nCurrent: ${currentValue}${valueUnit}\n\n✓ MAX LEVEL REACHED!`,
+						height / 2 + 18,
+						`${upgradeName}\n${upgradeDescription}\n\nLevel: ${currentLevel}/${maxLevel}\nCurrent: ${currentValue}${valueUnit}\n\n✓ MAX LEVEL REACHED!`,
 						{
 							fontSize: "10px",
 							fill: "#000",
 							fontFamily: "Arial",
 							align: "center",
+							wordWrap: { width: shopWindowWidth - 20 },
 						},
 					)
 					.setOrigin(0.5, 0.5);
 
 				// Max level button (disabled)
 				buyButton = this.add
-					.rectangle(width / 2, height / 2 + 25, 100, 20, 0x888888)
+					.rectangle(width / 2, actionY, 110, 20, 0x888888)
 					.setOrigin(0.5, 0.5);
 
 				buyButtonText = this.add
-					.text(width / 2, height / 2 + 25, "MAX LEVEL", {
+					.text(width / 2, actionY, "MAX LEVEL", {
 						fontSize: "10px",
 						fill: "#fff",
 						fontFamily: "Arial",
@@ -554,13 +638,14 @@ export default class marketScene extends Phaser.Scene {
 				infoText = this.add
 					.text(
 						width / 2,
-						height / 2 - 10,
-						`${upgradeName}\n\nLevel: ${currentLevel}/${maxLevel}\nCurrent: ${currentValue}${valueUnit}\nNext: ${nextValue}${valueUnit}\n\nCost: ${cost} gold`,
+						height / 2 + 18,
+						`${upgradeName}\n${upgradeDescription}\n\nLevel: ${currentLevel}/${maxLevel}\nCurrent: ${currentValue}${valueUnit}\nNext: ${nextValue}${valueUnit}\n\nCost: ${cost} gold`,
 						{
 							fontSize: "10px",
 							fill: "#000",
 							fontFamily: "Arial",
 							align: "center",
+							wordWrap: { width: shopWindowWidth - 20 },
 						},
 					)
 					.setOrigin(0.5, 0.5);
@@ -573,7 +658,7 @@ export default class marketScene extends Phaser.Scene {
 				buyButton = this.add
 					.rectangle(
 						width / 2,
-						height / 2 + 25,
+						actionY,
 						100,
 						20,
 						canAfford ? 0x00ff00 : 0x888888,
@@ -582,17 +667,12 @@ export default class marketScene extends Phaser.Scene {
 					.setInteractive({ useHandCursor: canAfford });
 
 				buyButtonText = this.add
-					.text(
-						width / 2,
-						height / 2 + 25,
-						canAfford ? "UPGRADE" : "NOT ENOUGH GOLD",
-						{
-							fontSize: "9px",
-							fill: canAfford ? "#000" : "#fff",
-							fontFamily: "Arial",
-							fontStyle: "bold",
-						},
-					)
+					.text(width / 2, actionY, canAfford ? "UPGRADE" : "NOT ENOUGH GOLD", {
+						fontSize: "9px",
+						fill: canAfford ? "#000" : "#fff",
+						fontFamily: "Arial",
+						fontStyle: "bold",
+					})
 					.setOrigin(0.5, 0.5);
 
 				// Buy handler
@@ -621,6 +701,8 @@ export default class marketScene extends Phaser.Scene {
 						buyButtonText.destroy();
 						closeButton.destroy();
 						closeButtonText.destroy();
+						descriptionText.destroy();
+						if (upgradeIcon) upgradeIcon.destroy();
 						this.openShop(shopType);
 					});
 				}
@@ -629,12 +711,12 @@ export default class marketScene extends Phaser.Scene {
 
 		// Close button
 		const closeButton = this.add
-			.rectangle(width / 2, height / 2 + 50, 60, 18, 0xff0000)
+			.rectangle(width / 2, closeY, 60, 18, 0xff0000)
 			.setOrigin(0.5, 0.5)
 			.setInteractive({ useHandCursor: true });
 
 		const closeButtonText = this.add
-			.text(width / 2, height / 2 + 50, "CLOSE", {
+			.text(width / 2, closeY, "CLOSE", {
 				fontSize: "10px",
 				fill: "#fff",
 				fontFamily: "Arial",
@@ -648,8 +730,10 @@ export default class marketScene extends Phaser.Scene {
 			shopBorder.destroy();
 			titleText.destroy();
 			infoText.destroy();
+			descriptionText.destroy();
 			closeButton.destroy();
 			closeButtonText.destroy();
+			if (upgradeIcon) upgradeIcon.destroy();
 			if (buyButton) buyButton.destroy();
 			if (buyButtonText) buyButtonText.destroy();
 		});

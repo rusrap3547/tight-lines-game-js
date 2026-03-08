@@ -124,7 +124,7 @@ TIPS
 
 • Upgrade your bait to attract rarer fish
 • Stronger line gives more time in minigames
-• Better rods make hooking easier
+• Rod upgrades unlock bigger fish sizes
 • Fish at different times for variety
 • Complete 15 casts to end the day
 • Sell fish at market for gold (10% of points)`;

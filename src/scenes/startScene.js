@@ -126,10 +126,17 @@ export default class startScene extends Phaser.Scene {
 			.setAlpha(0.6);
 
 		// Menu buttons configuration
-		const buttonWidth = 180;
-		const buttonHeight = 35;
-		const buttonSpacing = 45;
-		const startY = height / 2 - 20;
+		const buttonCount = 4;
+		const buttonWidth = Math.min(220, Math.max(150, Math.floor(width * 0.47)));
+		const buttonHeight = Math.min(35, Math.max(24, Math.floor(height * 0.12)));
+		const gap = Math.max(8, Math.floor(height * 0.03));
+		const totalMenuHeight =
+			buttonCount * buttonHeight + (buttonCount - 1) * gap;
+		const startY = Math.max(
+			height * 0.33,
+			(height - totalMenuHeight) / 2 + buttonHeight / 2,
+		);
+		const buttonSpacing = buttonHeight + gap;
 
 		// Create menu buttons
 		this.createMenuButton(

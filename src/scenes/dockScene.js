@@ -516,6 +516,7 @@ export default class dockScene extends Phaser.Scene {
 		// Get Bait upgrade level (increases rare fish chance by 5% per level)
 		const baitLevel = this.registry.get("baitLevel") || 0;
 		const baitBonus = baitLevel * 0.05; // 5% per level
+		const rodTier = this.getRodSpawnTier();
 
 		// Roll for super rare Bottle first (0.03% chance = ~1 per hour at 2 spawns/sec)
 		const bottleRoll = Math.random();
@@ -539,7 +540,7 @@ export default class dockScene extends Phaser.Scene {
 
 		// Roll for evil Gar (5% chance)
 		const garRoll = Math.random();
-		if (garRoll < 0.05) {
+		if (garRoll < 0.05 && this.isFishAllowedByRodTier("Gar", rodTier)) {
 			return { type: "Gar", isTrash: false, isHazard: true };
 		}
 
@@ -547,14 +548,29 @@ export default class dockScene extends Phaser.Scene {
 		const legendaryRoll = Math.random();
 		if (legendaryRoll < 0.02 + baitBonus) {
 			const legendaryFish = ["Arowana", "GreatWhiteShark"];
-			return { type: Phaser.Math.RND.pick(legendaryFish), isTrash: false };
+			const availableLegendaryFish = this.filterFishByRodTier(
+				legendaryFish,
+				rodTier,
+			);
+			if (availableLegendaryFish.length > 0) {
+				return {
+					type: Phaser.Math.RND.pick(availableLegendaryFish),
+					isTrash: false,
+				};
+			}
 		}
 
 		// Roll for rare fish (8% base chance + bait bonus)
 		const rareRoll = Math.random();
 		if (rareRoll < 0.08 + baitBonus) {
 			const rareFish = ["Tuna", "Stingray", "Anglerfish"];
-			return { type: Phaser.Math.RND.pick(rareFish), isTrash: false };
+			const availableRareFish = this.filterFishByRodTier(rareFish, rodTier);
+			if (availableRareFish.length > 0) {
+				return {
+					type: Phaser.Math.RND.pick(availableRareFish),
+					isTrash: false,
+				};
+			}
 		}
 
 		// Otherwise pick from common/medium fish
@@ -571,7 +587,46 @@ export default class dockScene extends Phaser.Scene {
 			"Angelfish",
 			"Carp",
 		];
-		return { type: Phaser.Math.RND.pick(commonFish), isTrash: false };
+		const availableCommonFish = this.filterFishByRodTier(commonFish, rodTier);
+		return {
+			type: Phaser.Math.RND.pick(availableCommonFish),
+			isTrash: false,
+		};
+	}
+
+	getRodSpawnTier() {
+		const rodLevel = Number(this.registry.get("rodLevel")) || 0;
+
+		if (rodLevel >= 3) return 3;
+		if (rodLevel >= 2) return 2;
+		return 1;
+	}
+
+	isFishAllowedByRodTier(fishType, rodTier) {
+		const fishConfig = FishTypes[fishType];
+		if (!fishConfig) return true;
+
+		if (rodTier === 1) {
+			// Tier 1: only fish smaller than medium.
+			return fishConfig.size < 1.0;
+		}
+
+		if (rodTier === 2) {
+			// Tier 2: unlock medium fish.
+			return fishConfig.size < 1.5;
+		}
+
+		// Tier 3+: unlock all fish sizes.
+		return true;
+	}
+
+	filterFishByRodTier(fishPool, rodTier) {
+		const filteredFish = fishPool.filter((fishType) =>
+			this.isFishAllowedByRodTier(fishType, rodTier),
+		);
+
+		// Safety fallback to avoid empty spawn pools.
+		return filteredFish.length > 0 ? filteredFish : fishPool;
 	}
 
 	spawnFish() {
@@ -875,6 +930,33 @@ export default class dockScene extends Phaser.Scene {
 		};
 	}
 
+	getCurrentHookLevel() {
+		const hookLevelRaw = this.registry.get("hookLevel");
+		const hookLevel = Number(hookLevelRaw);
+
+		if (!Number.isNaN(hookLevel) && hookLevel > 0) {
+			return hookLevel;
+		}
+
+		// Fallback for older saves/systems that still use rodLevel.
+		const rodLevel = Number(this.registry.get("rodLevel")) || 0;
+		return rodLevel + 1;
+	}
+
+	getRequiredHookLevelForFish(fishSize) {
+		if (fishSize >= 1.5) {
+			// Large and bigger fish require level 3 hook.
+			return 3;
+		}
+
+		if (fishSize >= 1.0) {
+			// Medium fish require level 2 hook.
+			return 2;
+		}
+
+		return 1;
+	}
+
 	checkMiniGameTiming() {
 		if (!this.miniGameUI || !this.currentFishCaught) return;
 
@@ -891,6 +973,27 @@ export default class dockScene extends Phaser.Scene {
 		const success = markerX >= successLeft && markerX <= successRight;
 
 		if (success) {
+			const requiredHookLevel = this.getRequiredHookLevelForFish(fish.size);
+			const currentHookLevel = this.getCurrentHookLevel();
+
+			if (currentHookLevel < requiredHookLevel) {
+				console.log(
+					`❌ Hook too weak for ${fish.fishType}. Need hook level ${requiredHookLevel}, have ${currentHookLevel}.`,
+				);
+
+				this.miniGameUI.titleText.setText(
+					`HOOK TOO WEAK!\nNeed L${requiredHookLevel}`,
+				);
+				this.miniGameUI.titleText.setColor("#ff0000");
+
+				this.time.delayedCall(650, () => {
+					this.closeMiniGame();
+					this.bobber.isReturning = true;
+				});
+
+				return;
+			}
+
 			// SUCCESS! Hook the fish
 			this.miniGameSuccess = true;
 
