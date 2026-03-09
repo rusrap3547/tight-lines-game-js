@@ -1,4 +1,9 @@
 import Phaser from "phaser";
+import {
+	ensureAudioSettings,
+	playSceneMusic,
+	preloadAllMusic,
+} from "../audio/audioManager.js";
 
 /*
 RHYTHM MINIGAME - DDR/Guitar Hero style
@@ -65,6 +70,8 @@ export default class Minigame extends Phaser.Scene {
 	}
 
 	preload() {
+		preloadAllMusic(this);
+
 		// Load arrow images
 		this.load.image("leftArrow", "assets/images/minigame/leftArrow.png");
 		this.load.image("upArrow", "assets/images/minigame/upArrow.png");
@@ -101,6 +108,8 @@ export default class Minigame extends Phaser.Scene {
 
 	create() {
 		const { width, height } = this.cameras.main;
+		ensureAudioSettings(this);
+		playSceneMusic(this, "Minigame");
 
 		// Calculate right half starting position
 		const rightHalfStart = width / 2;

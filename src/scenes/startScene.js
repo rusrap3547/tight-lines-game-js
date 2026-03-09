@@ -1,4 +1,13 @@
 import Phaser from "phaser";
+import {
+	ensureAudioSettings,
+	getMusicVolume,
+	getSfxVolume,
+	playSceneMusic,
+	preloadAllMusic,
+	setMusicVolume,
+	setSfxVolume,
+} from "../audio/audioManager.js";
 
 export default class startScene extends Phaser.Scene {
 	constructor() {
@@ -26,11 +35,15 @@ export default class startScene extends Phaser.Scene {
 		this.load.image("bass", "assets/sprites/Fresh Water/Bass.png");
 		this.load.image("goldfish", "assets/sprites/Fresh Water/Goldfish.png");
 		this.load.image("salmon", "assets/sprites/Fresh Water/Salmon.png");
+
+		preloadAllMusic(this);
 	}
 
 	create() {
 		const width = this.cameras.main.width;
 		const height = this.cameras.main.height;
+		ensureAudioSettings(this);
+		playSceneMusic(this, "startScene");
 
 		// Create parallax background layers - use image instead of tileSprite to fill screen
 		this.sky = this.add
@@ -126,7 +139,7 @@ export default class startScene extends Phaser.Scene {
 			.setAlpha(0.6);
 
 		// Menu buttons configuration
-		const buttonCount = 4;
+		const buttonCount = 5;
 		const buttonWidth = Math.min(220, Math.max(150, Math.floor(width * 0.47)));
 		const buttonHeight = Math.min(35, Math.max(24, Math.floor(height * 0.12)));
 		const gap = Math.max(8, Math.floor(height * 0.03));
@@ -166,6 +179,14 @@ export default class startScene extends Phaser.Scene {
 		this.createMenuButton(
 			width / 2,
 			startY + buttonSpacing * 3,
+			buttonWidth,
+			buttonHeight,
+			"OPTIONS",
+			() => this.showOptions(),
+		);
+		this.createMenuButton(
+			width / 2,
+			startY + buttonSpacing * 4,
 			buttonWidth,
 			buttonHeight,
 			"EXIT GAME",
@@ -264,9 +285,56 @@ export default class startScene extends Phaser.Scene {
 		return { bg: buttonBg, text: buttonText };
 	}
 
+	createVolumeSlider(x, y, initialValue, onChange, depth = 101) {
+		const sliderWidth = 160;
+		const sliderHeight = 8;
+		const minX = x - sliderWidth / 2;
+
+		const trackBg = this.add
+			.rectangle(x, y, sliderWidth, sliderHeight, 0x333333, 1)
+			.setDepth(depth)
+			.setInteractive({ useHandCursor: true });
+
+		const trackFill = this.add
+			.rectangle(minX, y, 1, sliderHeight, 0xffd700, 1)
+			.setOrigin(0, 0.5)
+			.setDepth(depth + 1);
+
+		const knob = this.add
+			.circle(minX + sliderWidth * initialValue, y, 9, 0xffffff, 1)
+			.setStrokeStyle(2, 0x000000)
+			.setDepth(depth + 2)
+			.setInteractive({ draggable: true, useHandCursor: true });
+
+		const updateSlider = (value) => {
+			const clamped = Phaser.Math.Clamp(value, 0, 1);
+			trackFill.width = Math.max(1, sliderWidth * clamped);
+			knob.x = minX + sliderWidth * clamped;
+			onChange(clamped);
+		};
+
+		const getValueFromX = (pointerX) => (pointerX - minX) / sliderWidth;
+
+		this.input.setDraggable(knob);
+
+		knob.on("drag", (_, dragX) => {
+			updateSlider(getValueFromX(dragX));
+		});
+
+		trackBg.on("pointerdown", (pointer) => {
+			updateSlider(getValueFromX(pointer.x));
+		});
+
+		updateSlider(initialValue);
+
+		return [trackBg, trackFill, knob];
+	}
+
 	showOptions() {
 		const width = this.cameras.main.width;
 		const height = this.cameras.main.height;
+		const currentMusicVolume = getMusicVolume(this);
+		const currentSfxVolume = getSfxVolume(this);
 
 		this.showingOptions = true;
 
@@ -287,18 +355,67 @@ export default class startScene extends Phaser.Scene {
 			.setOrigin(0.5)
 			.setDepth(101);
 
-		// Options content (placeholder for now)
-		const optionsText = this.add
+		const musicLabel = this.add
 			.text(
 				width / 2,
-				height / 2 - 30,
-				"Audio Settings\n\nMusic Volume: 100%\nSFX Volume: 100%\n\nControls\n\nMouse: Cast & Navigate\nArrow Keys/WASD: Minigame",
+				height / 2 - 65,
+				`Music Volume: ${Math.round(currentMusicVolume * 100)}%`,
 				{
-					fontSize: "12px",
+					fontSize: "14px",
+					fill: "#FFFFFF",
+					fontFamily: "Arial",
+					fontStyle: "bold",
+				},
+			)
+			.setOrigin(0.5)
+			.setDepth(101);
+
+		const musicSliderObjects = this.createVolumeSlider(
+			width / 2,
+			height / 2 - 40,
+			currentMusicVolume,
+			(value) => {
+				setMusicVolume(this, value);
+				musicLabel.setText(`Music Volume: ${Math.round(value * 100)}%`);
+			},
+		);
+
+		const sfxLabel = this.add
+			.text(
+				width / 2,
+				height / 2 + 5,
+				`SFX Volume: ${Math.round(currentSfxVolume * 100)}%`,
+				{
+					fontSize: "14px",
+					fill: "#FFFFFF",
+					fontFamily: "Arial",
+					fontStyle: "bold",
+				},
+			)
+			.setOrigin(0.5)
+			.setDepth(101);
+
+		const sfxSliderObjects = this.createVolumeSlider(
+			width / 2,
+			height / 2 + 30,
+			currentSfxVolume,
+			(value) => {
+				setSfxVolume(this, value);
+				sfxLabel.setText(`SFX Volume: ${Math.round(value * 100)}%`);
+			},
+		);
+
+		const controlsText = this.add
+			.text(
+				width / 2,
+				height / 2 + 72,
+				"Controls\nMouse: Cast & Navigate\nArrow Keys/WASD: Minigame",
+				{
+					fontSize: "11px",
 					fill: "#FFFFFF",
 					fontFamily: "Arial",
 					align: "center",
-					lineSpacing: 8,
+					lineSpacing: 6,
 				},
 			)
 			.setOrigin(0.5)
@@ -333,7 +450,11 @@ export default class startScene extends Phaser.Scene {
 		backButtonBg.on("pointerdown", () => {
 			optionsOverlay.destroy();
 			optionsTitle.destroy();
-			optionsText.destroy();
+			musicLabel.destroy();
+			sfxLabel.destroy();
+			controlsText.destroy();
+			musicSliderObjects.forEach((obj) => obj.destroy());
+			sfxSliderObjects.forEach((obj) => obj.destroy());
 			backButtonBg.destroy();
 			backButtonText.destroy();
 			this.showingOptions = false;

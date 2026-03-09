@@ -1,5 +1,10 @@
 import Phaser from "phaser";
 import { Player, Bobber, Fish, FishTypes, TrashItems } from "../gameObjects.js";
+import {
+	ensureAudioSettings,
+	playSceneMusic,
+	preloadAllMusic,
+} from "../audio/audioManager.js";
 
 // ============================================
 // CONFIGURATION CONSTANTS
@@ -108,6 +113,8 @@ export default class dockScene extends Phaser.Scene {
 	}
 
 	preload() {
+		preloadAllMusic(this);
+
 		// Load layered dock backgrounds (384x216)
 		this.load.image("layer_sky", "assets/images/Dock/0sky.png");
 		this.load.image("layer_clouds", "assets/images/Dock/1clouds.png");
@@ -230,6 +237,8 @@ export default class dockScene extends Phaser.Scene {
 
 	create() {
 		const { width, height } = this.cameras.main;
+		ensureAudioSettings(this);
+		playSceneMusic(this, "DockScene");
 
 		// ============================================
 		// CREATE ANIMATIONS

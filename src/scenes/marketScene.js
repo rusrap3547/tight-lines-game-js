@@ -1,4 +1,9 @@
 import Phaser from "phaser";
+import {
+	ensureAudioSettings,
+	playSceneMusic,
+	preloadAllMusic,
+} from "../audio/audioManager.js";
 
 // ============================================
 // CONFIGURATION CONSTANTS
@@ -81,6 +86,8 @@ export default class marketScene extends Phaser.Scene {
 	}
 
 	preload() {
+		preloadAllMusic(this);
+
 		// Load market stalls sprite sheet (12 stalls, 3 columns x 4 rows)
 		this.load.spritesheet("marketStalls", "assets/images/Market/sprite.png", {
 			frameWidth: Math.floor(128 / 3),
@@ -108,6 +115,8 @@ export default class marketScene extends Phaser.Scene {
 
 	create() {
 		const { width, height } = this.cameras.main;
+		ensureAudioSettings(this);
+		playSceneMusic(this, "MarketScene");
 
 		console.log("🛒 MarketScene create - starting to build scene");
 
