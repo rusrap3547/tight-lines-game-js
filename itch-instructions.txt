@@ -1,0 +1,35 @@
+Tight Lines - Download & Play Instructions
+=========================================
+
+Thank you for downloading Tight Lines!
+
+How to Play (Desktop Version)
+-----------------------------
+1. Download the correct version for your operating system:
+   - **Windows:** Download the .zip or .exe file and extract it to a folder.
+   - **Mac:** Download the .zip file, then open and drag the app to your Applications folder (or run from the extracted folder).
+   - **Linux:** Download the AppImage, make it executable, and run it.
+
+2. Open the extracted folder and double-click the `Tight Lines` application to start the game.
+
+3. If you see a security warning (especially on Mac):
+   - Right-click the app and choose "Open" to bypass the warning.
+   - You may need to allow the app in your system's security settings.
+
+4. Enjoy fishing!
+
+Troubleshooting
+---------------
+- If the game doesn't start, make sure your system meets the minimum requirements and that you downloaded the correct version for your OS.
+- On Mac, you may need to allow apps from unidentified developers in System Preferences > Security & Privacy.
+
+Controls
+--------
+- All controls are in-game and explained in the tutorial.
+
+Feedback
+--------
+If you encounter any issues or have suggestions, please leave a comment on the game's itch.io page!
+
+---
+Created with Phaser & Electron. Enjoy your adventure!
