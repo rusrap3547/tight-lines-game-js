@@ -116,123 +116,123 @@ export default class dockScene extends Phaser.Scene {
 		preloadAllMusic(this);
 
 		// Load layered dock backgrounds (384x216)
-		this.load.image("layer_sky", "assets/images/Dock/0sky.png");
-		this.load.image("layer_clouds", "assets/images/Dock/1clouds.png");
-		this.load.image("layer_shadowTrees", "assets/images/Dock/2shadowTrees.png");
+		this.load.image("layer_sky", "images/Dock/0sky.png");
+		this.load.image("layer_clouds", "images/Dock/1clouds.png");
+		this.load.image("layer_shadowTrees", "images/Dock/2shadowTrees.png");
 		this.load.image(
 			"layer_backgroundTrees",
-			"assets/images/Dock/3backgroundTrees.png",
+			"images/Dock/3backgroundTrees.png",
 		);
-		this.load.image("layer_middleTrees", "assets/images/Dock/4middleTrees.png");
-		this.load.image("layer_frontTrees", "assets/images/Dock/5frontTrees.png");
+		this.load.image("layer_middleTrees", "images/Dock/4middleTrees.png");
+		this.load.image("layer_frontTrees", "images/Dock/5frontTrees.png");
 		this.load.image(
 			"layer_horizonAndSea",
-			"assets/images/Dock/6horizonAndSea.png",
+			"images/Dock/6horizonAndSea.png",
 		);
-		this.load.image("layer_oceanFloor", "assets/images/Dock/7oceanFloor.png");
-		this.load.image("layer_pondWater", "assets/images/Dock/8pondWater.png");
-		this.load.image("dockMap", "assets/images/Dock/dockMap.png");
-		this.load.image("boat", "assets/images/Dock/Boat.png");
+		this.load.image("layer_oceanFloor", "images/Dock/7oceanFloor.png");
+		this.load.image("layer_pondWater", "images/Dock/8pondWater.png");
+		this.load.image("dockMap", "images/Dock/dockMap.png");
+		this.load.image("boat", "images/Dock/Boat.png");
 
 		// Load fisherman spritesheets (48x48 per frame)
 		this.load.spritesheet(
 			"fisherman_idle",
-			"assets/sprites/1 Fisherman/Fisherman_idle.png",
+			"sprites/1 Fisherman/Fisherman_idle.png",
 			{ frameWidth: 48, frameHeight: 48 },
 		);
 		this.load.spritesheet(
 			"fisherman_fish",
-			"assets/sprites/1 Fisherman/Fisherman_fish.png",
+			"sprites/1 Fisherman/Fisherman_fish.png",
 			{ frameWidth: 48, frameHeight: 48 },
 		);
 		this.load.spritesheet(
 			"fisherman_hook",
-			"assets/sprites/1 Fisherman/Fisherman_hook.png",
+			"sprites/1 Fisherman/Fisherman_hook.png",
 			{ frameWidth: 48, frameHeight: 48 },
 		);
 
 		// Load worm sprite for bobber
-		this.load.image("worm", "assets/sprites/Misc/Worm.png");
+		this.load.image("worm", "sprites/Misc/Worm.png");
 
 		// Load freshwater fish sprites
-		this.load.image("guppy", "assets/sprites/Fresh Water/Guppy.png");
-		this.load.image("neon_tetra", "assets/sprites/Fresh Water/Neon Tetra.png");
+		this.load.image("guppy", "sprites/Fresh Water/Guppy.png");
+		this.load.image("neon_tetra", "sprites/Fresh Water/Neon Tetra.png");
 		this.load.image(
 			"silverjaw_minnow",
-			"assets/sprites/Fresh Water/Silverjaw Minnow.png",
+			"sprites/Fresh Water/Silverjaw Minnow.png",
 		);
-		this.load.image("goldfish", "assets/sprites/Fresh Water/Goldfish.png");
-		this.load.image("bluegill", "assets/sprites/Fresh Water/Bluegill.png");
+		this.load.image("goldfish", "sprites/Fresh Water/Goldfish.png");
+		this.load.image("bluegill", "sprites/Fresh Water/Bluegill.png");
 		this.load.image(
 			"yellow_perch",
-			"assets/sprites/Fresh Water/Yellow Perch.png",
+			"sprites/Fresh Water/Yellow Perch.png",
 		);
-		this.load.image("angelfish", "assets/sprites/Fresh Water/Angelfish.png");
-		this.load.image("carp", "assets/sprites/Fresh Water/Carp.png");
+		this.load.image("angelfish", "sprites/Fresh Water/Angelfish.png");
+		this.load.image("carp", "sprites/Fresh Water/Carp.png");
 		this.load.image(
 			"rainbow_trout",
-			"assets/sprites/Fresh Water/Rainbow Trout.png",
+			"sprites/Fresh Water/Rainbow Trout.png",
 		);
-		this.load.image("salmon", "assets/sprites/Fresh Water/Salmon.png");
-		this.load.image("bass", "assets/sprites/Fresh Water/Bass.png");
-		this.load.image("catfish", "assets/sprites/Fresh Water/Catfish.png");
-		this.load.image("arowana", "assets/sprites/Fresh Water/Arowana.png");
-		this.load.image("gar", "assets/sprites/Fresh Water/gar.png");
+		this.load.image("salmon", "sprites/Fresh Water/Salmon.png");
+		this.load.image("bass", "sprites/Fresh Water/Bass.png");
+		this.load.image("catfish", "sprites/Fresh Water/Catfish.png");
+		this.load.image("arowana", "sprites/Fresh Water/Arowana.png");
+		this.load.image("gar", "sprites/Fresh Water/gar.png");
 
 		// Load saltwater fish sprites
-		this.load.image("anchovy", "assets/sprites/Salt Water/Anchovy.png");
-		this.load.image("goby", "assets/sprites/Salt Water/Goby.png");
-		this.load.image("clownfish", "assets/sprites/Salt Water/Clownfish.png");
-		this.load.image("seahorse", "assets/sprites/Salt Water/Seahorse.png");
+		this.load.image("anchovy", "sprites/Salt Water/Anchovy.png");
+		this.load.image("goby", "sprites/Salt Water/Goby.png");
+		this.load.image("clownfish", "sprites/Salt Water/Clownfish.png");
+		this.load.image("seahorse", "sprites/Salt Water/Seahorse.png");
 		this.load.image(
 			"blue_angelfish",
-			"assets/sprites/Salt Water/Blue Angelfish.png",
+			"sprites/Salt Water/Blue Angelfish.png",
 		);
-		this.load.image("yellow_tang", "assets/sprites/Salt Water/Yellow Tang.png");
-		this.load.image("purple_tang", "assets/sprites/Salt Water/Purple Tang.png");
-		this.load.image("surgeonfish", "assets/sprites/Salt Water/Surgeonfish.png");
-		this.load.image("pufferfish", "assets/sprites/Salt Water/Pufferfish.png");
-		this.load.image("flounder", "assets/sprites/Salt Water/Flounder.png");
-		this.load.image("ribbon_eel", "assets/sprites/Salt Water/Ribbon Eel.png");
-		this.load.image("moray_eel", "assets/sprites/Salt Water/Moray Eel.png");
-		this.load.image("tuna", "assets/sprites/Salt Water/Tuna.png");
-		this.load.image("blue_groper", "assets/sprites/Salt Water/Blue Groper.png");
+		this.load.image("yellow_tang", "sprites/Salt Water/Yellow Tang.png");
+		this.load.image("purple_tang", "sprites/Salt Water/Purple Tang.png");
+		this.load.image("surgeonfish", "sprites/Salt Water/Surgeonfish.png");
+		this.load.image("pufferfish", "sprites/Salt Water/Pufferfish.png");
+		this.load.image("flounder", "sprites/Salt Water/Flounder.png");
+		this.load.image("ribbon_eel", "sprites/Salt Water/Ribbon Eel.png");
+		this.load.image("moray_eel", "sprites/Salt Water/Moray Eel.png");
+		this.load.image("tuna", "sprites/Salt Water/Tuna.png");
+		this.load.image("blue_groper", "sprites/Salt Water/Blue Groper.png");
 		this.load.image(
 			"napoleon_wrasse",
-			"assets/sprites/Salt Water/Napoleon Wrasse.png",
+			"sprites/Salt Water/Napoleon Wrasse.png",
 		);
-		this.load.image("stingray", "assets/sprites/Salt Water/Stingray.png");
-		this.load.image("anglerfish", "assets/sprites/Salt Water/Anglerfish.png");
+		this.load.image("stingray", "sprites/Salt Water/Stingray.png");
+		this.load.image("anglerfish", "sprites/Salt Water/Anglerfish.png");
 		this.load.image(
 			"great_white_shark",
-			"assets/sprites/Salt Water/Great White Shark.png",
+			"sprites/Salt Water/Great White Shark.png",
 		);
 
 		// Load crustaceans and other marine life
-		this.load.image("crab_blue", "assets/sprites/Salt Water/Crab - Blue.png");
+		this.load.image("crab_blue", "sprites/Salt Water/Crab - Blue.png");
 		this.load.image(
 			"crab_dungeness",
-			"assets/sprites/Salt Water/Crab - Dungeness.png",
+			"sprites/Salt Water/Crab - Dungeness.png",
 		);
-		this.load.image("crab_king", "assets/sprites/Salt Water/Crab - King.png");
-		this.load.image("shrimp", "assets/sprites/Salt Water/Shrimp.png");
-		this.load.image("jellyfish", "assets/sprites/Salt Water/Jellyfish.png");
+		this.load.image("crab_king", "sprites/Salt Water/Crab - King.png");
+		this.load.image("shrimp", "sprites/Salt Water/Shrimp.png");
+		this.load.image("jellyfish", "sprites/Salt Water/Jellyfish.png");
 		this.load.image(
 			"upside_down_jellyfish",
-			"assets/sprites/Salt Water/Upside Down Jellyfish.png",
+			"sprites/Salt Water/Upside Down Jellyfish.png",
 		);
-		this.load.image("starfish", "assets/sprites/Salt Water/Starfish.png");
-		this.load.image("mussel", "assets/sprites/Fresh Water/Mussel.png");
-		this.load.image("tadpole", "assets/sprites/Fresh Water/Tadpole.png");
-		this.load.image("sand_dollar", "assets/sprites/Misc/Sand Dollar.png");
-		this.load.image("seashell", "assets/sprites/Misc/Seashell.png");
-		this.load.image("pearl", "assets/sprites/Misc/Pearl.png");
+		this.load.image("starfish", "sprites/Salt Water/Starfish.png");
+		this.load.image("mussel", "sprites/Fresh Water/Mussel.png");
+		this.load.image("tadpole", "sprites/Fresh Water/Tadpole.png");
+		this.load.image("sand_dollar", "sprites/Misc/Sand Dollar.png");
+		this.load.image("seashell", "sprites/Misc/Seashell.png");
+		this.load.image("pearl", "sprites/Misc/Pearl.png");
 
 		// Load trash items
-		this.load.image("rusty_can", "assets/sprites/Misc/Rusty Can.png");
-		this.load.image("bottle", "assets/sprites/Misc/Bottle.png");
-		this.load.image("apple_core", "assets/sprites/Misc/Apple Core.png");
-		this.load.image("seaweed", "assets/sprites/Misc/Seaweed.png");
+		this.load.image("rusty_can", "sprites/Misc/Rusty Can.png");
+		this.load.image("bottle", "sprites/Misc/Bottle.png");
+		this.load.image("apple_core", "sprites/Misc/Apple Core.png");
+		this.load.image("seaweed", "sprites/Misc/Seaweed.png");
 	}
 
 	create() {

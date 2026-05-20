@@ -73,32 +73,32 @@ export default class Minigame extends Phaser.Scene {
 		preloadAllMusic(this);
 
 		// Load arrow images
-		this.load.image("leftArrow", "assets/images/minigame/leftArrow.png");
-		this.load.image("upArrow", "assets/images/minigame/upArrow.png");
-		this.load.image("downArrow", "assets/images/minigame/downArrow.png");
-		this.load.image("rightArrow", "assets/images/minigame/rightArrow.png");
+		this.load.image("leftArrow", "images/minigame/leftArrow.png");
+		this.load.image("upArrow", "images/minigame/upArrow.png");
+		this.load.image("downArrow", "images/minigame/downArrow.png");
+		this.load.image("rightArrow", "images/minigame/rightArrow.png");
 
 		this.load.image(
 			"hollowLeftArrow",
-			"assets/images/minigame/hollowleftArrow.png",
+			"images/minigame/hollowleftArrow.png",
 		);
 		this.load.image(
 			"hollowUpArrow",
-			"assets/images/minigame/hollowUpArrow.png",
+			"images/minigame/hollowUpArrow.png",
 		);
 		this.load.image(
 			"hollowDownArrow",
-			"assets/images/minigame/hollowDownArrow.png",
+			"images/minigame/hollowDownArrow.png",
 		);
 		this.load.image(
 			"hollowRightArrow",
-			"assets/images/minigame/hollowRightArrow.png",
+			"images/minigame/hollowRightArrow.png",
 		);
 
 		// Load fishing rod sprite sheet (12 frames across, 8 rows down, 64x64 per frame)
 		this.load.spritesheet(
 			"fishingRod",
-			"assets/images/Upgrades/FISHING ROD/fishingRodSprites.png",
+			"images/Upgrades/FISHING ROD/fishingRodSprites.png",
 			{
 				frameWidth: 64,
 				frameHeight: 64,

@@ -2,6 +2,7 @@ const { app, BrowserWindow } = require("electron");
 const path = require("path");
 
 const isDev = !app.isPackaged;
+const distIndexPath = path.join(__dirname, "..", "dist", "index.html");
 
 function createWindow() {
 	const win = new BrowserWindow({
@@ -17,11 +18,35 @@ function createWindow() {
 		},
 	});
 
+	const loadDist = () => win.loadFile(distIndexPath);
+
+	win.webContents.on(
+		"did-fail-load",
+		(event, errorCode, errorDescription, validatedURL, isMainFrame) => {
+			if (!isMainFrame) {
+				return;
+			}
+
+			console.error(
+				`Renderer failed to load (${errorCode}): ${errorDescription} (${validatedURL})`,
+			);
+
+			if (isDev && validatedURL.startsWith("http://localhost:5173")) {
+				console.log("Falling back to local dist build.");
+				loadDist();
+			}
+		},
+	);
+
+	win.webContents.on("render-process-gone", (_event, details) => {
+		console.error("Renderer process exited:", details);
+	});
+
 	if (isDev) {
 		win.loadURL("http://localhost:5173");
 		win.webContents.openDevTools({ mode: "detach" });
 	} else {
-		win.loadFile(path.join(__dirname, "..", "dist", "index.html"));
+		loadDist();
 	}
 }
 

@@ -8,7 +8,7 @@ export const ALL_MUSIC_TRACKS = Array.from({ length: 11 }, (_, index) => {
 	const paddedIndex = String(index).padStart(2, "0");
 	return {
 		key: `music_freshwater_${paddedIndex}`,
-		path: `assets/Music/freshwater${paddedIndex}.wav`,
+		path: `music/freshwater${paddedIndex}.wav`,
 	};
 });
 

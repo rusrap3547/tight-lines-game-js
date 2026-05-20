@@ -10,8 +10,9 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"dist": "npm run dist:win",
-		"dist:win": "npm run build && electron-builder --win portable --x64",
-		"dist:win:arm64": "npm run build && electron-builder --win portable --arm64",
+		"postdist:win": "node -e \"const fs=require('fs');fs.mkdirSync('release',{recursive:true});fs.copyFileSync('tightLines.bat','release/tightLines.bat')\"",
+		"dist:win": "npm run build && electron-builder --win portable --x64 && npm run postdist:win",
+		"dist:win:arm64": "npm run build && electron-builder --win portable --arm64 && npm run postdist:win",
 		"dist:mac": "npm run build && electron-builder --mac zip"
 	},
 	"repository": {

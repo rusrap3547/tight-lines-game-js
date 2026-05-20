@@ -89,27 +89,27 @@ export default class marketScene extends Phaser.Scene {
 		preloadAllMusic(this);
 
 		// Load market stalls sprite sheet (12 stalls, 3 columns x 4 rows)
-		this.load.spritesheet("marketStalls", "assets/images/Market/sprite.png", {
+		this.load.spritesheet("marketStalls", "images/Market/sprite.png", {
 			frameWidth: Math.floor(128 / 3),
 			frameHeight: 32,
 		});
 
 		// Load market background images
-		this.load.image("marketDock", "assets/images/Market/marketDock.png");
-		this.load.image("marketOcean", "assets/images/Market/marketOcean.png");
+		this.load.image("marketDock", "images/Market/marketDock.png");
+		this.load.image("marketOcean", "images/Market/marketOcean.png");
 
 		// Load upgrade icons for shop UI
 		this.load.image(
 			UPGRADE_ICONS.bait,
-			"assets/images/Upgrades/STORE ITEMS/wormV2.png",
+			"images/Upgrades/STORE ITEMS/wormV2.png",
 		);
 		this.load.image(
 			UPGRADE_ICONS.line,
-			"assets/images/Upgrades/STORE ITEMS/bob.png",
+			"images/Upgrades/STORE ITEMS/bob.png",
 		);
 		this.load.image(
 			UPGRADE_ICONS.rod,
-			"assets/images/Upgrades/STORE ITEMS/1classicRod.png",
+			"images/Upgrades/STORE ITEMS/1classicRod.png",
 		);
 	}
 

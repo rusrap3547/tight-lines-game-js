@@ -17,24 +17,24 @@ export default class startScene extends Phaser.Scene {
 
 	preload() {
 		// Load title screen assets
-		this.load.image("sky", "assets/images/Dock/0sky.png");
-		this.load.image("clouds", "assets/images/Dock/1clouds.png");
-		this.load.image("shadowTrees", "assets/images/Dock/2shadowTrees.png");
+		this.load.image("sky", "images/Dock/0sky.png");
+		this.load.image("clouds", "images/Dock/1clouds.png");
+		this.load.image("shadowTrees", "images/Dock/2shadowTrees.png");
 		this.load.image(
 			"backgroundTrees",
-			"assets/images/Dock/3backgroundTrees.png",
+			"images/Dock/3backgroundTrees.png",
 		);
-		this.load.image("middleTrees", "assets/images/Dock/4middleTrees.png");
-		this.load.image("frontTrees", "assets/images/Dock/5frontTrees.png");
-		this.load.image("horizonAndSea", "assets/images/Dock/6horizonAndSea.png");
-		this.load.image("oceanFloor", "assets/images/Dock/7oceanFloor.png");
-		this.load.image("pondWater", "assets/images/Dock/8pondWater.png");
-		this.load.image("boat", "assets/images/Dock/Boat.png");
+		this.load.image("middleTrees", "images/Dock/4middleTrees.png");
+		this.load.image("frontTrees", "images/Dock/5frontTrees.png");
+		this.load.image("horizonAndSea", "images/Dock/6horizonAndSea.png");
+		this.load.image("oceanFloor", "images/Dock/7oceanFloor.png");
+		this.load.image("pondWater", "images/Dock/8pondWater.png");
+		this.load.image("boat", "images/Dock/Boat.png");
 
 		// Load fish sprites for title screen animation
-		this.load.image("bass", "assets/sprites/Fresh Water/Bass.png");
-		this.load.image("goldfish", "assets/sprites/Fresh Water/Goldfish.png");
-		this.load.image("salmon", "assets/sprites/Fresh Water/Salmon.png");
+		this.load.image("bass", "sprites/Fresh Water/Bass.png");
+		this.load.image("goldfish", "sprites/Fresh Water/Goldfish.png");
+		this.load.image("salmon", "sprites/Fresh Water/Salmon.png");
 
 		preloadAllMusic(this);
 	}
