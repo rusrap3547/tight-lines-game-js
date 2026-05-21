@@ -5,7 +5,13 @@
 	"scripts": {
 		"dev": "node ./node_modules/vite/bin/vite.js",
 		"build": "node ./node_modules/vite/bin/vite.js build",
-		"preview": "node ./node_modules/vite/bin/vite.js preview"
+		"preview": "node ./node_modules/vite/bin/vite.js preview",
+		"tauri": "tauri",
+		"tauri:dev": "tauri dev",
+		"tauri:build": "tauri build",
+		"tauri:build:bin": "tauri build --no-bundle",
+		"package:win": "npm run tauri:build:bin && node ./scripts/stage-windows-portable.cjs",
+		"package:win:zip": "powershell -NoProfile -Command \"if (Test-Path 'release/tightlines.zip') { Remove-Item 'release/tightlines.zip' -Force }; Compress-Archive -Path 'release/tightlines/*' -DestinationPath 'release/tightlines.zip'\""
 	},
 	"repository": {
 		"type": "git",
@@ -20,5 +26,8 @@
 	"dependencies": {
 		"phaser": "^3.90.0",
 		"vite": "^7.3.0"
+	},
+	"devDependencies": {
+		"@tauri-apps/cli": "^2.11.2"
 	}
 }
