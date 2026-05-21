@@ -3,7 +3,7 @@ Tight Lines - Download & Play Instructions
 
 Thank you for downloading Tight Lines!
 
-How to Play (Desktop Version)
+How to Play (Standalone Build)
 -----------------------------
 1. Download the correct version for your operating system:
    - **Windows:** Download the .zip or .exe file and extract it to a folder.
@@ -32,4 +32,4 @@ Feedback
 If you encounter any issues or have suggestions, please leave a comment on the game's itch.io page!
 
 ---
-Created with Phaser & Electron. Enjoy your adventure!
+Created with Phaser. Enjoy your adventure!
