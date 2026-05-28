@@ -1,35 +1,36 @@
-Tight Lines - Download & Play Instructions
-=========================================
+Tight Lines - Browser Play Instructions
+======================================
 
-Thank you for downloading Tight Lines!
+Thank you for playing Tight Lines!
 
-How to Play (Standalone Build)
------------------------------
-1. Download the correct version for your operating system:
-   - **Windows:** Download the .zip or .exe file and extract it to a folder.
-   - **Mac:** Download the .zip file, then open and drag the app to your Applications folder (or run from the extracted folder).
-   - **Linux:** Download the AppImage, make it executable, and run it.
+How to Play (Web Version)
+-------------------------
+1. Open the game page in a modern browser:
+   - Chrome
+   - Edge
+   - Firefox
+   - Safari
 
-2. Open the extracted folder and double-click the `Tight Lines` application to start the game.
+2. Click "Run game" on itch.io to start.
 
-3. If you see a security warning (especially on Mac):
-   - Right-click the app and choose "Open" to bypass the warning.
-   - You may need to allow the app in your system's security settings.
+3. If audio is muted, click once inside the game window to enable browser audio playback.
 
 4. Enjoy fishing!
 
 Troubleshooting
 ---------------
-- If the game doesn't start, make sure your system meets the minimum requirements and that you downloaded the correct version for your OS.
-- On Mac, you may need to allow apps from unidentified developers in System Preferences > Security & Privacy.
+- If the game does not load, hard refresh the page (Ctrl+F5 on Windows/Linux, Cmd+Shift+R on Mac).
+- Disable strict ad/script blockers for the itch.io game page if assets fail to load.
+- For best performance, close extra tabs and run in an up-to-date browser.
 
 Controls
 --------
-- All controls are in-game and explained in the tutorial.
+- Mouse for menus and casting.
+- Arrow keys or WASD during the minigame.
 
 Feedback
 --------
-If you encounter any issues or have suggestions, please leave a comment on the game's itch.io page!
+If you encounter any issues or have suggestions, please leave a comment on the game's itch.io page.
 
 ---
-Created with Phaser. Enjoy your adventure!
+Created with Phaser for web browsers.
