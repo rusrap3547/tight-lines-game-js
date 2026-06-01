@@ -3,6 +3,7 @@ import Phaser from "phaser";
 const AUDIO_SETTINGS_STORAGE_KEY = "tight-lines-audio-settings";
 const DEFAULT_MUSIC_VOLUME = 0.35;
 const DEFAULT_SFX_VOLUME = 1;
+const MUSIC_ENABLED = import.meta.env.VITE_ENABLE_MUSIC === "true";
 
 export const ALL_MUSIC_TRACKS = Array.from({ length: 11 }, (_, index) => {
 	const paddedIndex = String(index).padStart(2, "0");
@@ -75,6 +76,10 @@ export const ensureAudioSettings = (scene) => {
 };
 
 export const preloadAllMusic = (scene) => {
+	if (!MUSIC_ENABLED) {
+		return;
+	}
+
 	ALL_MUSIC_TRACKS.forEach((track) => {
 		if (!scene.cache.audio.exists(track.key)) {
 			scene.load.audio(track.key, track.path);
@@ -86,6 +91,11 @@ const getScenePlaylistKeys = (sceneKey) => {
 	const playlistIndexes =
 		SCENE_PLAYLISTS[sceneKey] || SCENE_PLAYLISTS.startScene;
 	return playlistIndexes.map((index) => ALL_MUSIC_TRACKS[index].key);
+};
+
+const getAvailablePlaylistKeys = (scene, sceneKey) => {
+	const playlist = getScenePlaylistKeys(sceneKey);
+	return playlist.filter((key) => scene.cache.audio.exists(key));
 };
 
 const getCurrentMusic = (scene) => {
@@ -143,9 +153,19 @@ export const setSfxVolume = (scene, value) => {
 };
 
 export const playSceneMusic = (scene, sceneKey) => {
+	if (!MUSIC_ENABLED) {
+		return;
+	}
+
 	ensureAudioSettings(scene);
 	const musicVolume = getMusicVolume(scene);
-	const playlist = getScenePlaylistKeys(sceneKey);
+	const playlist = getAvailablePlaylistKeys(scene, sceneKey);
+
+	if (playlist.length === 0) {
+		// Music files are optional in some builds; keep gameplay running without audio.
+		return;
+	}
+
 	const currentMusic = getCurrentMusic(scene);
 
 	if (currentMusic && playlist.includes(currentMusic.key)) {
